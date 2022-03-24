@@ -4,7 +4,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public class SimpleConnectionMaker {
+public class SimpleConnectionMaker implements ConnectionMaker {
 
     private static final String URL = "jdbc:mysql://localhost/springbook";
     private static final String USER = "youzheng";
@@ -14,8 +14,10 @@ public class SimpleConnectionMaker {
     public SimpleConnectionMaker() {
     }
 
-    Connection makeNewConnections() throws ClassNotFoundException, SQLException {
+    @Override
+    public Connection makeConnections() throws ClassNotFoundException, SQLException {
         Class.forName(JDBC_DRIVER);
         return DriverManager.getConnection(URL, USER, PASSWORD);
     }
+
 }
