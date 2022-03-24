@@ -1,9 +1,14 @@
 package springbook.user.dao;
 
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.io.IOException;
 import java.sql.SQLException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import springbook.user.domain.User;
 
 public class UserDaoTest {
@@ -27,7 +32,16 @@ public class UserDaoTest {
         userDao.add(this.user);
 
         User result = userDao.get(this.user.getId());
-        Assertions.assertNotNull(this.user);
+        assertNotNull(result);
+    }
+
+    @Test
+    public void daoFactoryTest() throws IOException {
+        ApplicationContext context = new AnnotationConfigApplicationContext(DaoFactory.class);
+        UserDao userDao = context.getBean("userDao", UserDao.class);
+        ConnectionMaker connectionMaker = context.getBean("connectionMaker", ConnectionMaker.class);
+        assertNotNull(userDao);
+        assertNotNull(connectionMaker);
     }
 
 }
