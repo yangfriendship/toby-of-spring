@@ -1,13 +1,9 @@
 package springbook.user.dao;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import java.sql.SQLException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.test.annotation.Rollback;
-import org.springframework.transaction.annotation.Transactional;
 import springbook.user.domain.User;
 
 public class UserDaoTest {
