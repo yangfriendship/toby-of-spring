@@ -13,6 +13,7 @@ subprojects {
         /* Test */
         testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
         testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+        testImplementation 'org.springframework:spring-test:3.1.4.RELEASE'
         /* Spring */
         implementation 'org.springframework:spring-context:3.1.4.RELEASE'
         implementation 'org.springframework:spring-core:3.1.4.RELEASE'
@@ -21,7 +22,6 @@ subprojects {
         /*Util*/
         compileOnly 'org.projectlombok:lombok:1.18.22'
 
-        /**/
         implementation 'mysql:mysql-connector-java:8.0.27'
 
 
