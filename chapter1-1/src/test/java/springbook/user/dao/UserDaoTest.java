@@ -15,7 +15,8 @@ public class UserDaoTest {
 
     @BeforeEach
     public void setup() {
-        this.userDao = new UserDao();
+        final ConnectionMaker connectionMaker = new SimpleConnectionMaker();
+        this.userDao = new UserDao(connectionMaker);
         this.user = new User();
         this.user.setId("id");
         this.user.setName("name");
