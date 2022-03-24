@@ -10,9 +10,14 @@ subprojects {
 
     dependencies {
 
+        /* Test */
         testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
         testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
-
+        /* Spring */
+        implementation 'org.springframework:spring-context:3.1.4.RELEASE'
+        implementation 'org.springframework:spring-core:3.1.4.RELEASE'
+        implementation 'org.springframework:spring-beans:3.1.4.RELEASE'
+        /*Util*/
         compileOnly 'org.projectlombok:lombok:1.18.22'
 
     }
