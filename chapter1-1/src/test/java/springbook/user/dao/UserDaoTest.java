@@ -36,12 +36,25 @@ public class UserDaoTest {
     }
 
     @Test
-    public void daoFactoryTest() throws IOException {
+    public void daoFactoryTest() {
         ApplicationContext context = new AnnotationConfigApplicationContext(DaoFactory.class);
         UserDao userDao = context.getBean("userDao", UserDao.class);
         ConnectionMaker connectionMaker = context.getBean("connectionMaker", ConnectionMaker.class);
         assertNotNull(userDao);
         assertNotNull(connectionMaker);
+    }
+
+    @Test
+    public void singletonTest() {
+        DaoFactory daoFactory = new DaoFactory();
+        UserDao userDao1 = daoFactory.userDao();
+        UserDao userDao2 = daoFactory.userDao();
+        assertNotSame(userDao1, userDao2);
+
+        ApplicationContext context = new AnnotationConfigApplicationContext(DaoFactory.class);
+        UserDao userDao3 = context.getBean("userDao", UserDao.class);
+        UserDao userDao4 = context.getBean("userDao", UserDao.class);
+        assertSame(userDao3, userDao4);
     }
 
 }
