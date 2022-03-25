@@ -3,7 +3,9 @@ package springbook.user.dao;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
+import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.UUID;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,8 +31,8 @@ public class UserDaoTest {
 
     @Test
     void userDaoTest() throws ClassNotFoundException, SQLException {
+        this.user.setId(UUID.randomUUID().toString().substring(0,10));
         userDao.add(this.user);
-
         User result = userDao.get(this.user.getId());
         assertNotNull(result);
     }
