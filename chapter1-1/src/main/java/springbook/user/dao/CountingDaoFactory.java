@@ -1,14 +1,18 @@
 package springbook.user.dao;
 
+import javax.sql.DataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 
 @Configuration
 public class CountingDaoFactory {
 
     @Bean
     public UserDao userDao() {
-        return new UserDao(connectionMaker());
+        UserDao userDao = new UserDao();
+        userDao.setDataSource(dataSource());
+        return userDao;
     }
 
     @Bean
@@ -19,6 +23,16 @@ public class CountingDaoFactory {
     @Bean
     public ConnectionMaker countingConnectionMaker() {
         return new CountingConnectionMaker(connectionMaker());
+    }
+
+    @Bean
+    public DataSource dataSource() {
+        SimpleDriverDataSource dataSource = new SimpleDriverDataSource();
+        dataSource.setDriverClass(com.mysql.cj.jdbc.Driver.class);
+        dataSource.setUrl("jdbc:mysql://localhost/springbook");
+        dataSource.setUsername("youzheng");
+        dataSource.setPassword("youzheng123");
+        return dataSource;
     }
 
 }
