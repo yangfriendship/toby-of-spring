@@ -1,3 +1,4 @@
 rootProject.name = 'spring-of-toby'
-include 'chapter1-1'
+include 'chapter1'
+include 'chapter2'
 
