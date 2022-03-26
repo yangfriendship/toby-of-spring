@@ -6,6 +6,7 @@ import java.util.List;
 import javax.sql.DataSource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import springbook.user.domain.Level;
 import springbook.user.domain.User;
 
 public class UserDaoJdbc implements UserDao {
@@ -19,7 +20,8 @@ public class UserDaoJdbc implements UserDao {
         @Override
         public User mapRow(ResultSet rs, int rowNum) throws SQLException {
             User user = new User(rs.getString("id"), rs.getString("name"),
-                rs.getString("password"));
+                rs.getString("password"), Level.valueOf(rs.getInt("level")),
+                rs.getInt("login"), rs.getInt("recommend"));
             return user;
         }
     };
@@ -30,8 +32,9 @@ public class UserDaoJdbc implements UserDao {
 
     @Override
     public void add(User user) {
-        final String sql = "INSERT INTO USERS (ID, NAME, PASSWORD) VALUES (?,?,?) ";
-        this.jdbcTemplate.update(sql, user.getId(), user.getName(), user.getPassword());
+        final String sql = "INSERT INTO USERS (ID, NAME, PASSWORD,LEVEL,LOGIN, RECOMMEND) VALUES (?,?,?,?,?,?) ";
+        this.jdbcTemplate.update(sql, user.getId(), user.getName(), user.getPassword(),
+            user.getLevel().intValue(), user.getLogin(), user.getRecommend());
     }
 
     @Override

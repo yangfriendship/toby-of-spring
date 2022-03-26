@@ -25,6 +25,7 @@ import org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import springbook.user.dao.connectionmaker.ConnectionMaker;
+import springbook.user.domain.Level;
 import springbook.user.domain.User;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -45,11 +46,11 @@ public class UserDaoTest {
 
     @Before
     public void setup() {
-        this.user = new User("id" + userSeq++, "name", "password");
+        this.user = new User("id" + userSeq++, "name", "password", Level.BASIC, 0, 0);
         this.users = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
             User user = new User("id" + userSeq++, UUID.randomUUID().toString().substring(0, 5),
-                "password");
+                "password", Level.valueOf(i + 1), 0, 0);
             users.add(user);
         }
     }
@@ -99,6 +100,9 @@ public class UserDaoTest {
         assertEquals(user.getId(), find.getId());
         assertEquals(user.getName(), find.getName());
         assertEquals(user.getPassword(), find.getPassword());
+        assertEquals(user.getLevel(), find.getLevel());
+        assertEquals(user.getLogin(), find.getLogin());
+        assertEquals(user.getRecommend(), find.getRecommend());
     }
 
     @Test
