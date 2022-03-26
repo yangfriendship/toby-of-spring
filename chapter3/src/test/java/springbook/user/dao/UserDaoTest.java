@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -17,7 +16,6 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import springbook.user.dao.connectionmaker.ConnectionMaker;
@@ -25,7 +23,6 @@ import springbook.user.domain.User;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "/applicationContext.xml")
-@DirtiesContext
 public class UserDaoTest {
 
     // Test target
@@ -49,13 +46,13 @@ public class UserDaoTest {
         }
     }
 
-    private void insertDummyUser() throws SQLException, ClassNotFoundException {
+    private void insertDummyUser() {
         this.user.setId("id" + userSeq++);
         this.userDao.add(this.user);
     }
 
     @Test
-    public void userDaoTest() throws ClassNotFoundException, SQLException {
+    public void userDaoTest()  {
         userDao.deleteAll();
         userDao.add(this.user);
         User result = userDao.get(this.user.getId());
@@ -109,7 +106,7 @@ public class UserDaoTest {
     }
 
     @Test
-    public void deleteAllTest() throws SQLException, ClassNotFoundException {
+    public void deleteAllTest() {
         // given: User * 2
         this.userDao.deleteAll();
         insertDummyUser();
@@ -124,7 +121,7 @@ public class UserDaoTest {
     }
 
     @Test
-    public void getCountTest() throws SQLException, ClassNotFoundException {
+    public void getCountTest() {
         // given: User * 2
         this.userDao.deleteAll();
         int count = this.userDao.getCount();

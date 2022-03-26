@@ -16,8 +16,8 @@
     <property name="password" value="youzheng123"/>
   </bean>
 
-<!--  <bean id="jdbcContext" class="springbook.user.dao.JdbcContext">-->
-<!--    <constructor-arg name="dataSource" ref="dataSource"/>-->
-<!--  </bean>-->
+  <bean id="jdbcContext" class="springbook.user.dao.JdbcContext">
+    <constructor-arg name="dataSource" ref="dataSource"/>
+  </bean>
 
 </beans>
