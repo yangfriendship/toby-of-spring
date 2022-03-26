@@ -1,34 +1,40 @@
 package springbook.user.dao;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.sql.SQLException;
-import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.support.GenericXmlApplicationContext;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.test.annotation.ExpectedException;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 import springbook.user.domain.User;
 
-@Transactional
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = "/applicationContext.xml")
 public class UserDaoTest {
 
     // Test target
+    @Autowired
     ApplicationContext context;
+    @Autowired
     UserDao userDao;
     // Fixture
     User user;
     int userSeq = 1;
 
-    @BeforeEach
+    @Before
     public void setup() {
-        context = new GenericXmlApplicationContext("applicationContext.xml");
-        this.userDao = context.getBean("userDao", UserDao.class);
         this.user = new User("id" + userSeq++, "name", "password");
     }
 
@@ -38,7 +44,7 @@ public class UserDaoTest {
     }
 
     @Test
-    void userDaoTest() throws ClassNotFoundException, SQLException {
+    public void userDaoTest() throws ClassNotFoundException, SQLException {
         userDao.deleteAll();
         userDao.add(this.user);
         User result = userDao.get(this.user.getId());
