@@ -2,36 +2,44 @@ package springbook.user.dao;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.io.IOException;
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.UUID;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.support.GenericXmlApplicationContext;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.test.annotation.ExpectedException;
+import org.springframework.transaction.annotation.Transactional;
 import springbook.user.domain.User;
 
+@Transactional
 public class UserDaoTest {
 
     // Test target
+    ApplicationContext context;
     UserDao userDao;
     // Fixture
     User user;
+    int userSeq = 1;
 
     @BeforeEach
     public void setup() {
-        this.userDao = new DaoFactory().userDao();
-        this.user = new User();
-        this.user.setId("id");
-        this.user.setName("name");
-        this.user.setPassword("password");
+        context = new GenericXmlApplicationContext("applicationContext.xml");
+        this.userDao = context.getBean("userDao", UserDao.class);
+        this.user = new User("id" + userSeq++, "name", "password");
+    }
+
+    private void insertDummyUser() throws SQLException, ClassNotFoundException {
+        this.user.setId("id" + userSeq++);
+        this.userDao.add(this.user);
     }
 
     @Test
     void userDaoTest() throws ClassNotFoundException, SQLException {
-        this.user.setId(UUID.randomUUID().toString().substring(0,10));
+        userDao.deleteAll();
         userDao.add(this.user);
         User result = userDao.get(this.user.getId());
         assertNotNull(result);
@@ -39,11 +47,36 @@ public class UserDaoTest {
 
     @Test
     public void daoFactoryTest() {
-        ApplicationContext context = new AnnotationConfigApplicationContext(DaoFactory.class);
-        UserDao userDao = context.getBean("userDao", UserDao.class);
-        ConnectionMaker connectionMaker = context.getBean("connectionMaker", ConnectionMaker.class);
+        UserDao userDao = this.context.getBean("userDao", UserDao.class);
+        ConnectionMaker connectionMaker = this.context.getBean("connectionMaker",
+            ConnectionMaker.class);
         assertNotNull(userDao);
         assertNotNull(connectionMaker);
+    }
+
+    @Test
+    public void addAndGetTest() throws Exception {
+        this.userDao.deleteAll();
+        assertEquals(0, this.userDao.getCount());
+
+        this.userDao.add(this.user);
+        assertEquals(1, this.userDao.getCount());
+        User find = this.userDao.get(this.user.getId());
+
+        assertEqualUser(this.user, find);
+    }
+
+    @Test
+    public void getUserFailure() throws Exception {
+        assertThrows(EmptyResultDataAccessException.class, () -> {
+            User find = this.userDao.get(this.user.getId());
+        });
+    }
+
+    private void assertEqualUser(User user, User find) {
+        assertEquals(user.getId(), find.getId());
+        assertEquals(user.getName(), find.getName());
+        assertEquals(user.getPassword(), find.getPassword());
     }
 
     @Test
@@ -53,10 +86,39 @@ public class UserDaoTest {
         UserDao userDao2 = daoFactory.userDao();
         assertNotSame(userDao1, userDao2);
 
-        ApplicationContext context = new AnnotationConfigApplicationContext(DaoFactory.class);
-        UserDao userDao3 = context.getBean("userDao", UserDao.class);
-        UserDao userDao4 = context.getBean("userDao", UserDao.class);
+        UserDao userDao3 = this.context.getBean("userDao", UserDao.class);
+        UserDao userDao4 = this.context.getBean("userDao", UserDao.class);
         assertSame(userDao3, userDao4);
+    }
+
+    @Test
+    public void deleteAllTest() throws SQLException, ClassNotFoundException {
+        // given: User * 2
+        this.userDao.deleteAll();
+        insertDummyUser();
+        insertDummyUser();
+        int count = this.userDao.getCount();
+        assertEquals(2, count);
+        // when
+        this.userDao.deleteAll();
+
+        int countOfDeleteAll = this.userDao.getCount();
+        assertEquals(0, countOfDeleteAll);
+    }
+
+    @Test
+    public void getCountTest() throws SQLException, ClassNotFoundException {
+        // given: User * 2
+        this.userDao.deleteAll();
+        int count = this.userDao.getCount();
+        assertEquals(0, count);
+
+        // when: add 1 user
+        insertDummyUser();
+
+        // then: count = 1
+        int countOfDeleteAll = this.userDao.getCount();
+        assertEquals(1, countOfDeleteAll);
     }
 
 }

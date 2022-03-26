@@ -2,7 +2,6 @@ package springbook.user.dao;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.zip.DataFormatException;
 import javax.sql.DataSource;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
