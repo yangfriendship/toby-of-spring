@@ -7,16 +7,16 @@ import org.springframework.context.support.GenericXmlApplicationContext;
 import springbook.user.dao.connectionmaker.ConnectionMaker;
 import springbook.user.dao.connectionmaker.SimpleConnectionMaker;
 
-class XmlUserDaoTest {
+class XmlUserDaoJdbcTest {
 
     @Test
     void xmlTest() {
         GenericXmlApplicationContext context = new GenericXmlApplicationContext(
             "applicationContext.xml");
-        UserDao userDao = context.getBean("userDao", UserDao.class);
+        UserDao userDaoJdbc = context.getBean("userDaoJdbc", UserDao.class);
         ConnectionMaker connectionMaker = context.getBean("connectionMaker", ConnectionMaker.class);
         assertNotNull(connectionMaker);
-        assertNotNull(userDao);
+        assertNotNull(userDaoJdbc);
         assertTrue(connectionMaker instanceof SimpleConnectionMaker);
     }
 
