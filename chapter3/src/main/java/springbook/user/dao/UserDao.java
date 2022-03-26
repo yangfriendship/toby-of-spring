@@ -6,19 +6,23 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import javax.sql.DataSource;
 import org.springframework.dao.EmptyResultDataAccessException;
-import springbook.user.dao.statementstrategy.DeleteAllStatementStrategy;
 import springbook.user.dao.statementstrategy.StatementStrategy;
 import springbook.user.domain.User;
 
 public class UserDao {
 
     private DataSource dataSource;
+    private JdbcContext jdbcContext;
 
     public UserDao() {
     }
 
     public void setDataSource(DataSource dataSource) {
         this.dataSource = dataSource;
+    }
+
+    public void setJdbcContext(JdbcContext jdbcContext) {
+        this.jdbcContext = jdbcContext;
     }
 
     class MemberInnerAddStatementStrategy implements StatementStrategy {
@@ -58,7 +62,7 @@ public class UserDao {
 
 //        StatementStrategy addStatementStrategy = new MemberInnerAddStatementStrategy();
 //        StatementStrategy addStatementStrategy = new LocalClassAddStatementStrategy();
-        jdbcContextWithStatementStrategy(new StatementStrategy() {
+        jdbcContext.jdbcContextWithStatementStrategy(new StatementStrategy() {
             @Override
             public PreparedStatement makePreparedStatement(Connection connection)
                 throws SQLException {
@@ -100,7 +104,7 @@ public class UserDao {
     }
 
     public void deleteAll() throws SQLException {
-        jdbcContextWithStatementStrategy(new StatementStrategy() {
+        jdbcContext.jdbcContextWithStatementStrategy(new StatementStrategy() {
             @Override
             public PreparedStatement makePreparedStatement(Connection connection)
                 throws SQLException {
@@ -109,33 +113,6 @@ public class UserDao {
                 return preparedStatement;
             }
         });
-    }
-
-    public void jdbcContextWithStatementStrategy(StatementStrategy strategy) throws SQLException {
-        Connection connection = null;
-        PreparedStatement prepareStatement = null;
-
-        try {
-            connection = dataSource.getConnection();
-            prepareStatement = strategy.makePreparedStatement(connection);
-            prepareStatement.executeUpdate();
-        } catch (SQLException e) {
-            throw e;
-        } finally {
-            if (prepareStatement != null) {
-                try {
-                    prepareStatement.close();
-                } catch (SQLException e) {
-                }
-            }
-            if (connection != null) {
-                try {
-                    connection.close();
-                } catch (SQLException e) {
-                }
-            }
-        }
-
     }
 
 
