@@ -6,7 +6,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import javax.sql.DataSource;
 import org.springframework.dao.EmptyResultDataAccessException;
-import springbook.user.dao.statementstrategy.AddStatementStrategy;
 import springbook.user.dao.statementstrategy.DeleteAllStatementStrategy;
 import springbook.user.dao.statementstrategy.StatementStrategy;
 import springbook.user.domain.User;
@@ -22,9 +21,55 @@ public class UserDao {
         this.dataSource = dataSource;
     }
 
+    class MemberInnerAddStatementStrategy implements StatementStrategy {
+
+        private final User user;
+
+        public MemberInnerAddStatementStrategy(User user) {
+            this.user = user;
+        }
+
+        @Override
+        public PreparedStatement makePreparedStatement(Connection connection) throws SQLException {
+            PreparedStatement ps = connection.prepareStatement(
+                "INSERT INTO USERS (ID, NAME, PASSWORD) VALUES (?,?,?) ");
+            ps.setString(1, user.getId());
+            ps.setString(2, user.getName());
+            ps.setString(3, user.getPassword());
+            return ps;
+        }
+    }
+
     public void add(User user) throws SQLException {
-        StatementStrategy addStatementStrategy = new AddStatementStrategy(user);
-        jdbcContextWithStatementStrategy(addStatementStrategy);
+
+        class LocalClassAddStatementStrategy implements StatementStrategy {
+
+            @Override
+            public PreparedStatement makePreparedStatement(Connection connection)
+                throws SQLException {
+                PreparedStatement ps = connection.prepareStatement(
+                    "INSERT INTO USERS (ID, NAME, PASSWORD) VALUES (?,?,?) ");
+                ps.setString(1, user.getId());
+                ps.setString(2, user.getName());
+                ps.setString(3, user.getPassword());
+                return ps;
+            }
+        }
+
+//        StatementStrategy addStatementStrategy = new MemberInnerAddStatementStrategy();
+//        StatementStrategy addStatementStrategy = new LocalClassAddStatementStrategy();
+        jdbcContextWithStatementStrategy(new StatementStrategy() {
+            @Override
+            public PreparedStatement makePreparedStatement(Connection connection)
+                throws SQLException {
+                PreparedStatement ps = connection.prepareStatement(
+                    "INSERT INTO USERS (ID, NAME, PASSWORD) VALUES (?,?,?) ");
+                ps.setString(1, user.getId());
+                ps.setString(2, user.getName());
+                ps.setString(3, user.getPassword());
+                return ps;
+            }
+        });
     }
 
     public User get(String id) throws ClassNotFoundException, SQLException {
@@ -55,8 +100,15 @@ public class UserDao {
     }
 
     public void deleteAll() throws SQLException {
-        StatementStrategy strategy = new DeleteAllStatementStrategy();
-        jdbcContextWithStatementStrategy(strategy);
+        jdbcContextWithStatementStrategy(new StatementStrategy() {
+            @Override
+            public PreparedStatement makePreparedStatement(Connection connection)
+                throws SQLException {
+                PreparedStatement preparedStatement = connection.prepareStatement(
+                    "delete from USERS;");
+                return preparedStatement;
+            }
+        });
     }
 
     public void jdbcContextWithStatementStrategy(StatementStrategy strategy) throws SQLException {
