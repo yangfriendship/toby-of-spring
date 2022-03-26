@@ -89,6 +89,17 @@ public class UserDao {
         });
     }
 
+    public List<User> getAll() {
+        final String sql = "SELECT * FROM USERS ORDER BY ID";
+        return this.jdbcTemplate.query(sql, new RowMapper<User>() {
+            @Override
+            public User mapRow(ResultSet rs, int rowNum) throws SQLException {
+                return new User(rs.getString("id"), rs.getString("name")
+                    , rs.getString("password"));
+            }
+        });
+    }
+
     public void deleteAll() throws SQLException {
         final String sql = "delete from USERS;";
 //        this.jdbcContext.executeSql(sql);
