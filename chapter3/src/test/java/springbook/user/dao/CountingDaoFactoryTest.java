@@ -7,6 +7,9 @@ import java.sql.SQLException;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import springbook.user.dao.connectionmaker.ConnectionMaker;
+import springbook.user.dao.connectionmaker.CountingConnectionMaker;
+import springbook.user.dao.connectionmaker.CountingDaoFactory;
 
 class CountingDaoFactoryTest {
 

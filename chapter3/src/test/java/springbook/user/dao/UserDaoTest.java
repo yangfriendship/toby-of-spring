@@ -16,6 +16,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import springbook.user.dao.connectionmaker.ConnectionMaker;
 import springbook.user.domain.User;
 
 @RunWith(SpringJUnit4ClassRunner.class)

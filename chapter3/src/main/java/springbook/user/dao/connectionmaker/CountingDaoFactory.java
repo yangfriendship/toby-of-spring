@@ -1,9 +1,10 @@
-package springbook.user.dao;
+package springbook.user.dao.connectionmaker;
 
 import javax.sql.DataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
+import springbook.user.dao.UserDao;
 
 @Configuration
 public class CountingDaoFactory {

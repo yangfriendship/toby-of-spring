@@ -6,12 +6,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import javax.sql.DataSource;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.metadata.SqlServerCallMetaDataProvider;
+import springbook.user.dao.statementstrategy.DeleteAllStatementStrategy;
+import springbook.user.dao.statementstrategy.StatementStrategy;
 import springbook.user.domain.User;
 
 public class UserDao {
 
-    //    private ConnectionMaker connectionMaker;
     private DataSource dataSource;
 
     public UserDao() {
@@ -70,7 +70,9 @@ public class UserDao {
 
         try {
             connection = dataSource.getConnection();
-            prepareStatement = connection.prepareStatement("DELETE FROM USERS");
+
+            StatementStrategy strategy = new DeleteAllStatementStrategy();
+            prepareStatement = strategy.makePreparedStatement(connection);
             prepareStatement.executeUpdate();
         } catch (SQLException e) {
             throw e;
@@ -90,6 +92,7 @@ public class UserDao {
         }
 
     }
+
 
     public int getCount() throws SQLException {
         Connection connection = null;
