@@ -4,12 +4,14 @@ import java.util.Arrays;
 
 public enum Level {
 
-    BASIC(1), SILVER(2), GOLD3(3);
+    GOLD(3, null), SILVER(2, GOLD), BASIC(1, SILVER);
 
     private int value;
+    private Level nextLevel;
 
-    Level(int value) {
+    Level(int value, Level nextLevel) {
         this.value = value;
+        this.nextLevel = nextLevel;
     }
 
     public int intValue() {

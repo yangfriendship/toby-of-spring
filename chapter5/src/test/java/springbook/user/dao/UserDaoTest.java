@@ -6,15 +6,18 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Predicate;
 import javax.sql.DataSource;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -94,15 +97,6 @@ public class UserDaoTest {
         assertThrows(EmptyResultDataAccessException.class, () -> {
             User find = this.userDao.get(this.user.getId());
         });
-    }
-
-    private void assertEqualUser(User user, User find) {
-        assertEquals(user.getId(), find.getId());
-        assertEquals(user.getName(), find.getName());
-        assertEquals(user.getPassword(), find.getPassword());
-        assertEquals(user.getLevel(), find.getLevel());
-        assertEquals(user.getLogin(), find.getLogin());
-        assertEquals(user.getRecommend(), find.getRecommend());
     }
 
     @Test
@@ -212,5 +206,65 @@ public class UserDaoTest {
         }
     }
 
+    @Test
+    public void updateTest() {
+        this.userDao.deleteAll();
+        this.userDao.add(this.users.get(0));
+        this.userDao.add(this.users.get(1));
+
+        User findUser = this.userDao.get(this.users.get(0).getId());
+        assertEqualUser(this.users.get(0), findUser);
+
+        findUser.setName("newName");
+        findUser.setPassword("newPwd");
+        findUser.setLevel(Level.GOLD);
+        findUser.setLogin(findUser.getLogin() + 1);
+        findUser.setLogin(findUser.getRecommend() + 1);
+        int affectedRowCount = this.userDao.update(findUser);
+        assertEquals(1, affectedRowCount);
+
+        User updateUser = this.userDao.get(this.users.get(0).getId());
+        assertEqualUser(findUser, updateUser);
+
+        User notUpdateUser = this.userDao.get(this.users.get(1).getId());
+        assertEqualUser(this.users.get(1), notUpdateUser);
+
+    }
+
+    public void assertEqualUserWithoutId(User user, User find) {
+        assertEqualUserWithoutId(user, find, true);
+    }
+
+    public void assertEqualUserWithoutId(User user, User find, boolean isExpectEqual) {
+        assertEquals(user.getName().equals(find.getName()), isExpectEqual);
+        assertEquals(user.getPassword().equals(find.getPassword()), isExpectEqual);
+        assertEquals(user.getLevel().equals(find.getLevel()), isExpectEqual);
+        assertEquals((user.getLogin() == find.getLogin()), isExpectEqual);
+        assertEquals((user.getRecommend() == find.getRecommend()), isExpectEqual);
+    }
+
+    private void assertEqualUser(User user, User find) {
+        assertEquals(user.getId(), find.getId());
+        assertEqualUserWithoutId(user, find, true);
+    }
+
+    private void assertEqualUser(User user, User find, boolean isExpectEqual) {
+        assertEquals(user.getId().equals(find.getId()), isExpectEqual);
+        assertEqualUserWithoutId(user, find, isExpectEqual);
+    }
+
+    private <T> void checkSameObject(T obj1, T obj2, TestFunc<T>... predicates) {
+        for (TestFunc<T> func : predicates) {
+            if (!func.isSame(obj1, obj2)) {
+                fail();
+            }
+        }
+    }
+
+    @FunctionalInterface
+    interface TestFunc<T> {
+
+        boolean isSame(T obj1, T obj2);
+    }
 
 }

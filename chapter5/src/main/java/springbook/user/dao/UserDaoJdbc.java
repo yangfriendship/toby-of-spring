@@ -31,9 +31,9 @@ public class UserDaoJdbc implements UserDao {
     }
 
     @Override
-    public void add(User user) {
+    public int add(User user) {
         final String sql = "INSERT INTO USERS (ID, NAME, PASSWORD,LEVEL,LOGIN, RECOMMEND) VALUES (?,?,?,?,?,?) ";
-        this.jdbcTemplate.update(sql, user.getId(), user.getName(), user.getPassword(),
+        return this.jdbcTemplate.update(sql, user.getId(), user.getName(), user.getPassword(),
             user.getLevel().intValue(), user.getLogin(), user.getRecommend());
     }
 
@@ -50,15 +50,24 @@ public class UserDaoJdbc implements UserDao {
     }
 
     @Override
-    public void deleteAll() {
+    public int deleteAll() {
         final String sql = "delete from USERS;";
-        this.jdbcTemplate.update(sql);
+        return this.jdbcTemplate.update(sql);
     }
 
     @Override
     public int getCount() {
         final String sql = "SELECT COUNT(*) FROM USERS";
         return this.jdbcTemplate.queryForInt(sql);
+    }
+
+    @Override
+    public int update(User user) {
+        final String sql = "UPDATE USERS SET NAME = ?, PASSWORD =? , LEVEL = ? , LOGIN = ? , RECOMMEND = ? WHERE ID = ?";
+        return this.jdbcTemplate.update(sql,
+            user.getName(), user.getPassword(), user.getLevel().intValue(), user.getLogin(),
+            user.getRecommend(), user.getId()
+        );
     }
 
 }
