@@ -7,6 +7,8 @@ import springbook.user.domain.User;
 
 public class UserService {
 
+    private static Level DEFAULT_LEVEL = Level.BASIC;
+
     private final UserDao userDao;
 
     public UserService(UserDao userDao) {
@@ -16,15 +18,15 @@ public class UserService {
     public void upgradeLevels() {
         final List<User> users = userDao.getAll();
         for (final User user : users) {
-            boolean changed = false;
+            boolean changed = true;
             if (user.getLevel() == Level.BASIC && user.getLogin() >= 50) {
                 user.setLevel(Level.SILVER);
-                changed = true;
             } else if (user.getLevel() == Level.SILVER && user.getRecommend() >= 30) {
                 user.setLevel(Level.GOLD);
-                changed = true;
             } else if (user.getLevel() == Level.GOLD) {
-                user.setLevel(Level.GOLD);
+                changed = false;
+            } else {
+                changed = false;
             }
             if (changed) {
                 userDao.update(user);
@@ -32,4 +34,11 @@ public class UserService {
         }
     }
 
+
+    public void add(User user) {
+        if (user.getLevel() == null) {
+            user.setLevel(DEFAULT_LEVEL);
+        }
+        this.userDao.add(user);
+    }
 }
