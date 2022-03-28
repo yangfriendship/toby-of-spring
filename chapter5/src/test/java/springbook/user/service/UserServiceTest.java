@@ -2,6 +2,7 @@ package springbook.user.service;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import javax.sql.DataSource;
@@ -10,7 +11,10 @@ import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.MailException;
 import org.springframework.mail.MailSender;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -64,18 +68,29 @@ public class UserServiceTest {
     }
 
     @Test
-    public void updateLevelsTest() throws Exception {
+    @DirtiesContext
+    public void updateLevelsTest() {
+        MockMailSender mockMailSender = new MockMailSender();
+        userService.setMailSender(mockMailSender);
+
         this.userDao.deleteAll();
         for (final User user : this.users) {
             this.userDao.add(user);
         }
 
         userService.upgradeLevels();
+
         checkLevel(this.users.get(0), false);
         checkLevel(this.users.get(1), true);
         checkLevel(this.users.get(2), false);
         checkLevel(this.users.get(3), true);
         checkLevel(this.users.get(4), false);
+
+        List<String> requests = mockMailSender.requests;
+
+        assertEquals(2, requests.size());
+        assertEquals(this.users.get(1).getEmail(), requests.get(0));
+        assertEquals(this.users.get(3).getEmail(), requests.get(1));
     }
 
     @Test
@@ -114,6 +129,21 @@ public class UserServiceTest {
             // do nothing...
         }
         checkLevel(users.get(1), false);
+    }
+
+    static class MockMailSender implements MailSender {
+
+        private List<String> requests = new ArrayList<>();
+
+        @Override
+        public void send(SimpleMailMessage simpleMessage) throws MailException {
+            this.requests.add(simpleMessage.getTo()[0]);
+        }
+
+        @Override
+        public void send(SimpleMailMessage[] simpleMessages) throws MailException {
+
+        }
     }
 
 }
