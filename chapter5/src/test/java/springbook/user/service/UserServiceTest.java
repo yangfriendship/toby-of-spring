@@ -14,6 +14,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import springbook.user.dao.UserDao;
 import springbook.user.domain.Level;
 import springbook.user.domain.User;
+import springbook.user.service.TestUserService.TestUserServiceException;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "/applicationContext.xml")
@@ -83,5 +84,22 @@ public class UserServiceTest {
 
     }
 
+    @Test
+    public void upgradeAllOrNothing() {
+        userDao.deleteAll();
+
+        TestUserService userService = new TestUserService(users.get(3).getId());
+        userService.setUserDao(this.userDao);
+        for (User user : this.users) {
+            this.userDao.add(user);
+        }
+        try {
+            userService.upgradeLevels();
+            fail("TestUserServiceException Expected!");
+        } catch (TestUserServiceException e) {
+            // do nothing...
+        }
+        checkLevel(users.get(1), false);
+    }
 
 }

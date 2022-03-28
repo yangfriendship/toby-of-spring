@@ -4,7 +4,7 @@
   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
   <bean id="userService" class="springbook.user.service.UserService">
-    <constructor-arg name="userDao" ref="userDaoJdbc"/>
+    <property name="userDao" ref="userDaoJdbc"/>
   </bean>
 
   <bean id="userDaoJdbc" class="springbook.user.dao.UserDaoJdbc">

@@ -1,6 +1,7 @@
 package springbook.user.service;
 
 import java.util.List;
+import lombok.Setter;
 import springbook.user.dao.UserDao;
 import springbook.user.domain.Level;
 import springbook.user.domain.User;
@@ -9,11 +10,8 @@ public class UserService {
 
     private static Level DEFAULT_LEVEL = Level.BASIC;
 
-    private final UserDao userDao;
-
-    public UserService(UserDao userDao) {
-        this.userDao = userDao;
-    }
+    @Setter
+    private UserDao userDao;
 
     public void upgradeLevels() {
         final List<User> users = userDao.getAll();
@@ -24,7 +22,7 @@ public class UserService {
         }
     }
 
-    private void upgradeLevel(User user) {
+    protected void upgradeLevel(User user) {
         user.upgradeLevel();
         this.userDao.update(user);
 
