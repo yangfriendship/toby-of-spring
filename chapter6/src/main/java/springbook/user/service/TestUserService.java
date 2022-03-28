@@ -1,10 +1,9 @@
 package springbook.user.service;
 
-import javax.sql.DataSource;
 import org.springframework.transaction.PlatformTransactionManager;
 import springbook.user.domain.User;
 
-public class TestUserService extends UserService {
+public class TestUserService extends UserServiceImpl {
 
     private String id;
 

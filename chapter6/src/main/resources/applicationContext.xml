@@ -3,15 +3,19 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-  <bean id="userService" class="springbook.user.service.UserService">
-    <property name="userDao" ref="userDaoJdbc"/>
+  <bean id="userService" class="springbook.user.service.UserServiceTx">
     <property name="transactionManager" ref="transactionManager"/>
+    <property name="userService" ref="userServiceImpl"/>
+  </bean>
+
+  <bean id="userServiceImpl" class="springbook.user.service.UserServiceImpl">
+    <property name="userDao" ref="userDaoJdbc"/>
     <property name="mailSender" ref="mailSender"/>
   </bean>
 
-<!--  <bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">-->
-<!--    <property name="host" value="mail.youzheng.me"/>-->
-<!--  </bean>-->
+  <!--  <bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">-->
+  <!--    <property name="host" value="mail.youzheng.me"/>-->
+  <!--  </bean>-->
   <!--Test Bean-->
   <bean id="mailSender" class="springbook.user.service.DummyMailSender"/>
 

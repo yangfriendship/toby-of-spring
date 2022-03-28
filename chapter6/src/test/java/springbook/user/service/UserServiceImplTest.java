@@ -8,7 +8,6 @@ import java.util.List;
 import javax.sql.DataSource;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailException;
@@ -25,12 +24,14 @@ import springbook.user.service.TestUserService.TestUserServiceException;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "/applicationContext.xml")
-public class UserServiceTest {
+public class UserServiceImplTest {
 
     public static final int MIN_LOGCOUNT_FOR_SILVER = 50;
     public static final int MIN_RECOMMEND_FOR_GOLD = 30;
     @Autowired
     UserService userService;
+    @Autowired
+    UserServiceImpl userServiceImpl;
     @Autowired
     UserDao userDao;
     @Autowired
@@ -58,7 +59,7 @@ public class UserServiceTest {
 
     @Test
     public void init() {
-        assertNotNull(this.userService);
+        assertNotNull(this.userServiceImpl);
         assertEquals(5, this.users.size());
     }
 
@@ -71,14 +72,14 @@ public class UserServiceTest {
     @DirtiesContext
     public void updateLevelsTest() {
         MockMailSender mockMailSender = new MockMailSender();
-        userService.setMailSender(mockMailSender);
+        userServiceImpl.setMailSender(mockMailSender);
 
         this.userDao.deleteAll();
         for (final User user : this.users) {
             this.userDao.add(user);
         }
 
-        userService.upgradeLevels();
+        userServiceImpl.upgradeLevels();
 
         checkLevel(this.users.get(0), false);
         checkLevel(this.users.get(1), true);
@@ -100,8 +101,8 @@ public class UserServiceTest {
         User userWithoutLevel = users.get(0);
         userWithoutLevel.setLevel(null);
 
-        this.userService.add(userWithLevel);
-        this.userService.add(userWithoutLevel);
+        this.userServiceImpl.add(userWithLevel);
+        this.userServiceImpl.add(userWithoutLevel);
 
         User userWithLevelRead = this.userDao.get(userWithLevel.getId());
         User userWithoutLevelRead = this.userDao.get(userWithoutLevel.getId());
@@ -117,13 +118,17 @@ public class UserServiceTest {
 
         TestUserService userService = new TestUserService(users.get(3).getId(),
             this.transactionManager);
+        UserServiceTx userServiceTx = new UserServiceTx();
+        userServiceTx.setUserService(userService);
+        userServiceTx.setTransactionManager(this.transactionManager);
+
         userService.setUserDao(this.userDao);
         userService.setMailSender(this.mailSender);
         for (User user : this.users) {
             this.userDao.add(user);
         }
         try {
-            userService.upgradeLevels();
+            userServiceTx.upgradeLevels();
             fail("TestUserServiceException Expected!");
         } catch (TestUserServiceException e) {
             // do nothing...
