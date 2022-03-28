@@ -9,3 +9,6 @@ create table users
 #     login     int         not null,
 #     recommend int         not null
 );
+
+alter table users
+    add email varchar(50) not null;

@@ -37,11 +37,15 @@ public class UserServiceTest {
     @Before
     public void setup() {
         this.users = Arrays.asList(
-            new User("woojung0", "woojung0", "p0", Level.BASIC, MIN_LOGCOUNT_FOR_SILVER - 1, 0),
-            new User("woojung1", "woojung1", "p1", Level.BASIC, MIN_LOGCOUNT_FOR_SILVER, 0),
-            new User("woojung2", "woojung2", "p2", Level.SILVER, 60, MIN_RECOMMEND_FOR_GOLD - 1),
-            new User("woojung3", "woojung3", "p3", Level.SILVER, 60, MIN_RECOMMEND_FOR_GOLD),
-            new User("woojung4", "woojung4", "p4", Level.GOLD, 100, 100)
+            new User("woojung0", "woojung0", "p0", "email0", Level.BASIC,
+                MIN_LOGCOUNT_FOR_SILVER - 1, 0),
+            new User("woojung1", "woojung1", "p1", "email1", Level.BASIC, MIN_LOGCOUNT_FOR_SILVER,
+                0),
+            new User("woojung2", "woojung2", "p2", "email2", Level.SILVER, 60,
+                MIN_RECOMMEND_FOR_GOLD - 1),
+            new User("woojung3", "woojung3", "p3", "email3", Level.SILVER, 60,
+                MIN_RECOMMEND_FOR_GOLD),
+            new User("woojung4", "woojung4", "p4", "email4", Level.GOLD, 100, 100)
         );
     }
 
@@ -93,7 +97,8 @@ public class UserServiceTest {
     public void upgradeAllOrNothing() {
         userDao.deleteAll();
 
-        TestUserService userService = new TestUserService(users.get(3).getId(), this.transactionManager);
+        TestUserService userService = new TestUserService(users.get(3).getId(),
+            this.transactionManager);
         userService.setUserDao(this.userDao);
 
         for (User user : this.users) {

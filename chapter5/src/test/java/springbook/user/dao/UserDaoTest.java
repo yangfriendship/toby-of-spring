@@ -49,11 +49,11 @@ public class UserDaoTest {
 
     @Before
     public void setup() {
-        this.user = new User("id" + userSeq++, "name", "password", Level.BASIC, 0, 0);
+        this.user = new User("id" + userSeq++, "name", "password", "email", Level.BASIC, 0, 0);
         this.users = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
             User user = new User("id" + userSeq++, UUID.randomUUID().toString().substring(0, 5),
-                "password", Level.valueOf(i + 1), 0, 0);
+                "password", "email", Level.valueOf(i + 1), 0, 0);
             users.add(user);
         }
     }

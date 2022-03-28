@@ -20,7 +20,7 @@ public class UserDaoJdbc implements UserDao {
         @Override
         public User mapRow(ResultSet rs, int rowNum) throws SQLException {
             User user = new User(rs.getString("id"), rs.getString("name"),
-                rs.getString("password"), Level.valueOf(rs.getInt("level")),
+                rs.getString("password"), rs.getString("email"), Level.valueOf(rs.getInt("level")),
                 rs.getInt("login"), rs.getInt("recommend"));
             return user;
         }
@@ -32,9 +32,9 @@ public class UserDaoJdbc implements UserDao {
 
     @Override
     public int add(User user) {
-        final String sql = "INSERT INTO USERS (ID, NAME, PASSWORD,LEVEL,LOGIN, RECOMMEND) VALUES (?,?,?,?,?,?) ";
+        final String sql = "INSERT INTO USERS (ID, NAME, PASSWORD,LEVEL,LOGIN, RECOMMEND,EMAIL) VALUES (?,?,?,?,?,?,?) ";
         return this.jdbcTemplate.update(sql, user.getId(), user.getName(), user.getPassword(),
-            user.getLevel().intValue(), user.getLogin(), user.getRecommend());
+            user.getLevel().intValue(), user.getLogin(), user.getRecommend(), user.getEmail());
     }
 
     @Override
@@ -63,10 +63,10 @@ public class UserDaoJdbc implements UserDao {
 
     @Override
     public int update(User user) {
-        final String sql = "UPDATE USERS SET NAME = ?, PASSWORD =? , LEVEL = ? , LOGIN = ? , RECOMMEND = ? WHERE ID = ?";
+        final String sql = "UPDATE USERS SET NAME = ?, PASSWORD =? , LEVEL = ? , LOGIN = ? , RECOMMEND = ?, EMAIL = ? WHERE ID = ?";
         return this.jdbcTemplate.update(sql,
             user.getName(), user.getPassword(), user.getLevel().intValue(), user.getLogin(),
-            user.getRecommend(), user.getId()
+            user.getRecommend(), user.getEmail(), user.getId()
         );
     }
 
