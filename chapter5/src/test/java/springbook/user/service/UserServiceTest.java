@@ -19,6 +19,8 @@ import springbook.user.domain.User;
 @ContextConfiguration(locations = "/applicationContext.xml")
 public class UserServiceTest {
 
+    public static final int MIN_LOGCOUNT_FOR_SILVER = 50;
+    public static final int MIN_RECOMMEND_FOR_GOLD = 30;
     @Autowired
     UserService userService;
     @Autowired
@@ -29,10 +31,10 @@ public class UserServiceTest {
     @Before
     public void setup() {
         this.users = Arrays.asList(
-            new User("woojung0", "woojung0", "p0", Level.BASIC, 49, 0),
-            new User("woojung1", "woojung1", "p1", Level.BASIC, 50, 0),
-            new User("woojung2", "woojung2", "p2", Level.SILVER, 60, 29),
-            new User("woojung3", "woojung3", "p3", Level.SILVER, 60, 30),
+            new User("woojung0", "woojung0", "p0", Level.BASIC, MIN_LOGCOUNT_FOR_SILVER - 1, 0),
+            new User("woojung1", "woojung1", "p1", Level.BASIC, MIN_LOGCOUNT_FOR_SILVER, 0),
+            new User("woojung2", "woojung2", "p2", Level.SILVER, 60, MIN_RECOMMEND_FOR_GOLD - 1),
+            new User("woojung3", "woojung3", "p3", Level.SILVER, 60, MIN_RECOMMEND_FOR_GOLD),
             new User("woojung4", "woojung4", "p4", Level.GOLD, 100, 100)
         );
     }
@@ -43,9 +45,9 @@ public class UserServiceTest {
         assertEquals(5, this.users.size());
     }
 
-    private void checkLevel(User user, Level expected) {
-        User findUser = this.userDao.get(user.getId());
-        assertEquals(expected, findUser.getLevel());
+    private void checkLevel(User user, boolean expected) {
+        User updatedUser = this.userDao.get(user.getId());
+        assertEquals(expected, user.getLevel() != updatedUser.getLevel());
     }
 
     @Test
@@ -56,11 +58,11 @@ public class UserServiceTest {
         }
 
         userService.upgradeLevels();
-        checkLevel(this.users.get(0), Level.BASIC);
-        checkLevel(this.users.get(1), Level.SILVER);
-        checkLevel(this.users.get(2), Level.SILVER);
-        checkLevel(this.users.get(4), Level.GOLD);
-        checkLevel(this.users.get(3), Level.GOLD);
+        checkLevel(this.users.get(0), false);
+        checkLevel(this.users.get(1), true);
+        checkLevel(this.users.get(2), false);
+        checkLevel(this.users.get(3), true);
+        checkLevel(this.users.get(4), false);
     }
 
     @Test
