@@ -4,7 +4,11 @@ import java.sql.Connection;
 import java.util.List;
 import javax.sql.DataSource;
 import lombok.Setter;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.DataSourceUtils;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import springbook.user.dao.UserDao;
 import springbook.user.domain.Level;
@@ -17,13 +21,12 @@ public class UserService {
     @Setter
     private UserDao userDao;
     @Setter
-    private DataSource dataSource;
+    private PlatformTransactionManager transactionManager;
 
-    public void upgradeLevels() throws Exception {
-        TransactionSynchronizationManager.initSynchronization();
-        assert this.dataSource != null;
-        Connection connection = DataSourceUtils.getConnection(this.dataSource);
-        connection.setAutoCommit(false);
+    public void upgradeLevels() {
+        TransactionStatus status = transactionManager.getTransaction(
+            new DefaultTransactionDefinition());
+
         try {
             final List<User> users = userDao.getAll();
             for (final User user : users) {
@@ -31,16 +34,11 @@ public class UserService {
                     upgradeLevel(user);
                 }
             }
-            connection.commit();
+            transactionManager.commit(status);
         } catch (Exception e) {
-            connection.rollback();
+            transactionManager.rollback(status);
             throw e;
-        } finally {
-            connection.close();
-            TransactionSynchronizationManager.unbindResource(this.dataSource);
-            TransactionSynchronizationManager.clearSynchronization();
         }
-
     }
 
     protected void upgradeLevel(User user) {
