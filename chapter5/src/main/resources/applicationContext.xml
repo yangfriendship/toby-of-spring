@@ -5,6 +5,7 @@
 
   <bean id="userService" class="springbook.user.service.UserService">
     <property name="userDao" ref="userDaoJdbc"/>
+    <property name="dataSource" ref="dataSource"/>
   </bean>
 
   <bean id="userDaoJdbc" class="springbook.user.dao.UserDaoJdbc">

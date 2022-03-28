@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Arrays;
 import java.util.List;
+import javax.sql.DataSource;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
@@ -26,6 +27,8 @@ public class UserServiceTest {
     UserService userService;
     @Autowired
     UserDao userDao;
+    @Autowired
+    DataSource dataSource;
 
     List<User> users;
 
@@ -52,7 +55,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void updateLevelsTest() {
+    public void updateLevelsTest() throws Exception {
         this.userDao.deleteAll();
         for (final User user : this.users) {
             this.userDao.add(user);
@@ -85,11 +88,13 @@ public class UserServiceTest {
     }
 
     @Test
-    public void upgradeAllOrNothing() {
+    public void upgradeAllOrNothing() throws Exception {
         userDao.deleteAll();
 
-        TestUserService userService = new TestUserService(users.get(3).getId());
+        TestUserService userService = new TestUserService(users.get(3).getId(), this.dataSource);
         userService.setUserDao(this.userDao);
+        userService.setDataSource(this.dataSource);
+
         for (User user : this.users) {
             this.userDao.add(user);
         }

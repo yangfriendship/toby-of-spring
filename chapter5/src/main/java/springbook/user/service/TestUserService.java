@@ -1,15 +1,17 @@
 package springbook.user.service;
 
-import springbook.user.dao.UserDao;
+import javax.sql.DataSource;
 import springbook.user.domain.User;
 
 public class TestUserService extends UserService {
 
     private String id;
 
-    public TestUserService(String id) {
+    public TestUserService(String id,DataSource dataSource) {
         this.id = id;
+        super.setDataSource(dataSource);
     }
+
 
     @Override
     protected void upgradeLevel(User user) {
