@@ -6,7 +6,14 @@
   <bean id="userService" class="springbook.user.service.UserService">
     <property name="userDao" ref="userDaoJdbc"/>
     <property name="transactionManager" ref="transactionManager"/>
+    <property name="mailSender" ref="mailSender"/>
   </bean>
+
+<!--  <bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">-->
+<!--    <property name="host" value="mail.youzheng.me"/>-->
+<!--  </bean>-->
+  <!--Test Bean-->
+  <bean id="mailSender" class="springbook.user.service.DummyMailSender"/>
 
   <bean id="transactionManager"
     class="org.springframework.jdbc.datasource.DataSourceTransactionManager">

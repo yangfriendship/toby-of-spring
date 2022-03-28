@@ -15,8 +15,7 @@ subprojects {
         testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
         testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
         testImplementation 'org.springframework:spring-test:3.1.4.RELEASE'
-        // https://mvnrepository.com/artifact/javax.mail/mail
-        implementation group: 'javax.mail', name: 'mail', version: '1.4.7'
+
 
         /* Spring */
         implementation 'org.springframework:spring-context:3.1.4.RELEASE'
@@ -24,6 +23,8 @@ subprojects {
         implementation 'org.springframework:spring-beans:3.1.4.RELEASE'
         implementation 'org.springframework:spring-jdbc:3.1.4.RELEASE'
         implementation 'org.springframework:spring-asm:3.1.4.RELEASE'
+        implementation group: 'org.springframework', name: 'spring-context-support', version: '3.1.4.RELEASE'
+
         implementation 'cglib:cglib:2.2'
 
         implementation 'org.springframework:spring-expression:3.1.4.RELEASE'
@@ -34,6 +35,8 @@ subprojects {
         annotationProcessor 'org.projectlombok:lombok:1.18.22'
         implementation 'org.eclipse.birt.runtime:org.apache.commons.logging:1.1.1.v201101211721'
         implementation 'mysql:mysql-connector-java:8.0.27'
+        implementation group: 'javax.mail', name: 'mail', version: '1.4.7'
+        implementation group: 'javax.activation', name: 'activation', version: '1.1.1'
 
     }
 
