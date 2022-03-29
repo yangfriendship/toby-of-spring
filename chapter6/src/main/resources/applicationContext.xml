@@ -13,12 +13,35 @@
     <property name="mailSender" ref="mailSender"/>
   </bean>
 
-  <bean id="userService" class="springbook.factorybean.TxProxyFactoryBean">
+  <bean id="transactionAdvice" class="springbook.learningtest.jdk.proxy.TransactionAdvice">
     <property name="transactionManager" ref="transactionManager"/>
-    <property name="pattern" value="upgradeLevels"/>
-    <property name="target" ref="userServiceImpl"/>
-    <property name="serviceInterface" value="springbook.user.service.UserService"/>
   </bean>
+
+  <bean id="transactionPointcut" class="org.springframework.aop.support.NameMatchMethodPointcut">
+    <property name="mappedName" value="upgrade*"/>
+  </bean>
+
+  <bean id="transactionAdvisor" class="org.springframework.aop.support.DefaultPointcutAdvisor">
+    <property name="advice" ref="transactionAdvice"/>
+    <property name="pointcut" ref="transactionPointcut"/>
+  </bean>
+
+  <bean id="userService" class="org.springframework.aop.framework.ProxyFactoryBean">
+    <property name="target" ref="userServiceImpl"/>
+    <property name="interceptorNames">
+      <list>
+        <value>transactionAdvisor</value>
+      </list>
+    </property>
+  </bean>
+
+  <!-- ProxyFactoryBean 사용-->
+  <!--  <bean id="userService" class="springbook.factorybean.TxProxyFactoryBean">-->
+  <!--    <property name="transactionManager" ref="transactionManager"/>-->
+  <!--    <property name="pattern" value="upgradeLevels"/>-->
+  <!--    <property name="target" ref="userServiceImpl"/>-->
+  <!--    <property name="serviceInterface" value="springbook.user.service.UserService"/>-->
+  <!--  </bean>-->
 
   <!--  <bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">-->
   <!--    <property name="host" value="mail.youzheng.me"/>-->
