@@ -19,6 +19,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.mail.MailException;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
@@ -26,6 +27,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.PlatformTransactionManager;
+import springbook.factorybean.TxProxyFactoryBean;
 import springbook.user.dao.UserDao;
 import springbook.user.domain.Level;
 import springbook.user.domain.User;
@@ -50,6 +52,8 @@ public class UserServiceImplTest {
     PlatformTransactionManager transactionManager;
     @Autowired
     MailSender mailSender;
+    @Autowired
+    ApplicationContext ctx;
     List<User> users;
 
     @Before
@@ -158,7 +162,8 @@ public class UserServiceImplTest {
     }
 
     @Test
-    public void upgradeAllOrNothing() {
+    @DirtiesContext
+    public void upgradeAllOrNothing() throws Exception {
         userDao.deleteAll();
 
         TestUserService testUserService = new TestUserService(users.get(3).getId(),
@@ -166,19 +171,14 @@ public class UserServiceImplTest {
         testUserService.setUserDao(this.userDao);
         testUserService.setMailSender(this.mailSender);
 
-        TransactionHandler transactionHandler = new TransactionHandler();
-        transactionHandler.setPattern("upgradeLevels");
-        transactionHandler.setTransactionManager(this.transactionManager);
-        transactionHandler.setTarget(testUserService);
-
-        UserService userService = (UserService) Proxy.newProxyInstance(getClass().getClassLoader(),
-            new Class[]{UserService.class}, transactionHandler);
-
+        TxProxyFactoryBean factoryBean = this.ctx.getBean("&userService", TxProxyFactoryBean.class);
+        factoryBean.setTarget(testUserService);
+        UserService txUserService = (UserService) factoryBean.getObject();
         for (User user : this.users) {
             this.userDao.add(user);
         }
         try {
-            userService.upgradeLevels();
+            txUserService.upgradeLevels();
             fail("TestUserServiceException Expected!");
         } catch (TestUserServiceException e) {
             // do nothing...
