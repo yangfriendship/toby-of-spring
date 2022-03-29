@@ -3,10 +3,12 @@ package springbook.user.service;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -27,6 +29,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import springbook.user.dao.UserDao;
 import springbook.user.domain.Level;
 import springbook.user.domain.User;
+import springbook.user.handler.TransactionHandler;
 import springbook.user.service.TestUserService.TestUserServiceException;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -158,19 +161,24 @@ public class UserServiceImplTest {
     public void upgradeAllOrNothing() {
         userDao.deleteAll();
 
-        TestUserService userService = new TestUserService(users.get(3).getId(),
+        TestUserService testUserService = new TestUserService(users.get(3).getId(),
             this.transactionManager);
-        UserServiceTx userServiceTx = new UserServiceTx();
-        userServiceTx.setUserService(userService);
-        userServiceTx.setTransactionManager(this.transactionManager);
+        testUserService.setUserDao(this.userDao);
+        testUserService.setMailSender(this.mailSender);
 
-        userService.setUserDao(this.userDao);
-        userService.setMailSender(this.mailSender);
+        TransactionHandler transactionHandler = new TransactionHandler();
+        transactionHandler.setPattern("upgradeLevels");
+        transactionHandler.setTransactionManager(this.transactionManager);
+        transactionHandler.setTarget(testUserService);
+
+        UserService userService = (UserService) Proxy.newProxyInstance(getClass().getClassLoader(),
+            new Class[]{UserService.class}, transactionHandler);
+
         for (User user : this.users) {
             this.userDao.add(user);
         }
         try {
-            userServiceTx.upgradeLevels();
+            userService.upgradeLevels();
             fail("TestUserServiceException Expected!");
         } catch (TestUserServiceException e) {
             // do nothing...
