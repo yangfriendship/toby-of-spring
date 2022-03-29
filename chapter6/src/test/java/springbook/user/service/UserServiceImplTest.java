@@ -1,14 +1,21 @@
 package springbook.user.service;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import javax.sql.DataSource;
+import jdk.nashorn.internal.objects.annotations.Getter;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailException;
 import org.springframework.mail.MailSender;
@@ -68,31 +75,66 @@ public class UserServiceImplTest {
         assertEquals(expected, user.getLevel() != updatedUser.getLevel());
     }
 
+    public void checkUserAndLevel(User updated, String expectedId, Level expectedLevel) {
+        assertEquals(expectedId, updated.getId());
+        assertEquals(expectedLevel, updated.getLevel());
+    }
+
+
     @Test
     @DirtiesContext
     public void updateLevelsTest() {
         MockMailSender mockMailSender = new MockMailSender();
         userServiceImpl.setMailSender(mockMailSender);
+        MockUserDao mockUserDao = new MockUserDao(this.users);
+        userServiceImpl.setUserDao(mockUserDao);
 
-        this.userDao.deleteAll();
-        for (final User user : this.users) {
-            this.userDao.add(user);
-        }
+//        this.userDao.deleteAll();
+//        for (final User user : this.users) {
+//            this.userDao.add(user);
+//        }
 
         userServiceImpl.upgradeLevels();
 
-        checkLevel(this.users.get(0), false);
-        checkLevel(this.users.get(1), true);
-        checkLevel(this.users.get(2), false);
-        checkLevel(this.users.get(3), true);
-        checkLevel(this.users.get(4), false);
+//        checkLevel(this.users.get(0), false);
+//        checkLevel(this.users.get(1), true);
+//        checkLevel(this.users.get(2), false);
+//        checkLevel(this.users.get(3), true);
+//        checkLevel(this.users.get(4), false);
 
         List<String> requests = mockMailSender.requests;
-
+        List<User> upgraded = mockUserDao.getUpgraded();
+        assertEquals(2, upgraded.size());
         assertEquals(2, requests.size());
-        assertEquals(this.users.get(1).getEmail(), requests.get(0));
-        assertEquals(this.users.get(3).getEmail(), requests.get(1));
+        checkUserAndLevel(upgraded.get(0), this.users.get(1).getName(), Level.SILVER);
+        checkUserAndLevel(upgraded.get(1), this.users.get(3).getName(), Level.GOLD);
     }
+
+    @Test
+    public void mockUpgradeLevel() {
+        // given
+        UserDao mockUserDao = mock(UserDao.class);
+        PlatformTransactionManager transactionManager = mock(PlatformTransactionManager.class);
+        MailSender mailSender = mock(MailSender.class);
+        UserServiceImpl userService = new UserServiceImpl();
+        userService.setTransactionManager(transactionManager);
+        userService.setUserDao(mockUserDao);
+        userService.setMailSender(mailSender);
+        ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
+        when(mockUserDao.getAll()).thenReturn(this.users);
+
+        //when
+        userService.upgradeLevels();
+
+        // then
+        verify(mockUserDao, times(2)).update(captor.capture());
+        verify(mailSender, times(2)).send(any(SimpleMailMessage.class));
+        List<User> values = captor.getAllValues();
+        assertEquals(values.get(0).getLevel(), Level.SILVER);
+        assertEquals(values.get(0).getEmail(), this.users.get(1).getEmail());
+        assertEquals(values.get(1).getEmail(), this.users.get(3).getEmail());
+    }
+
 
     @Test
     public void addTest() {
@@ -148,6 +190,54 @@ public class UserServiceImplTest {
         @Override
         public void send(SimpleMailMessage[] simpleMessages) throws MailException {
 
+        }
+    }
+
+    static class MockUserDao implements UserDao {
+
+        private List<User> users;
+        private List<User> upgraded = new ArrayList<>();
+
+        public List<User> getUpgraded() {
+            return upgraded;
+        }
+
+        public MockUserDao(List<User> users) {
+            this.users = users;
+        }
+
+        @Override
+        public int add(User user) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public User get(String id) {
+            return this.users.stream()
+                .filter(user -> user.getName().equals(id))
+                .findFirst()
+                .orElseThrow(RuntimeException::new);
+        }
+
+        @Override
+        public List<User> getAll() {
+            return this.users;
+        }
+
+        @Override
+        public int deleteAll() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public int getCount() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public int update(User user) {
+            this.upgraded.add(user);
+            return 0;
         }
     }
 
