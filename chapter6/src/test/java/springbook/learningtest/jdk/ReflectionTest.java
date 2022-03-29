@@ -23,15 +23,6 @@ public class ReflectionTest {
     }
 
     @Test
-    public void simpleProxy() throws Exception {
-        Hello helloTarget = new HelloTarget();
-        final String name = "woojung";
-        assertEquals("Hello " + name, helloTarget.sayHello(name));
-        assertEquals("Hi " + name, helloTarget.sayHi(name));
-        assertEquals("ThankYou " + name, helloTarget.sayThankYou(name));
-    }
-
-    @Test
     public void helloUppercaseTest() {
         Hello helloTarget = new HelloUppercase(new HelloTarget());
         final String name = "woojung";
