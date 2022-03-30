@@ -2,31 +2,41 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns:aop="http://www.springframework.org/schema/aop"
-  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+  xmlns:tx="http://www.springframework.org/schema/tx"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
 
   <aop:config>
     <!--    <aop:pointcut id="transactionPointcut" expression="execution(* *..*ServiceImple.upgrade(int,int))"/>-->
     <!--    <aop:advisor advice-ref="transactionAdvice" pointcut-ref="transactionPointcut" />-->
     <aop:advisor advice-ref="transactionAdvice"
-      pointcut="execution(* *..*ServiceImple.upgrade(int,int))"/>
+      pointcut="execution(* *..*ServiceImpl.upgrade*(..))"/>
   </aop:config>
+
+  <!--  org.springframework.transaction.interceptor.TransactionInterceptor 를 빈으로 등록하는 방법도 있다.-->
+  <tx:advice id="transactionAdvice" transaction-manager="transactionManager">
+    <tx:attributes>
+      <tx:method name="get*" propagation="REQUIRED" read-only="true" timeout="30"/>
+      <tx:method name="upgrade*" propagation="REQUIRES_NEW" isolation="SERIALIZABLE"/>
+      <tx:method name="*" propagation="REQUIRED"/>
+    </tx:attributes>
+  </tx:advice>
 
   <!-- Transaction Proxy-->
   <!--  <bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator"/>-->
 
-  <bean id="transactionPointcut"
-    class="org.springframework.aop.aspectj.AspectJExpressionPointcut">
-    <property name="expression" value="execution(* *..*ServiceImpl.upgrade*(..))"/>
-  </bean>
+  <!--  <bean id="transactionPointcut"-->
+  <!--    class="org.springframework.aop.aspectj.AspectJExpressionPointcut">-->
+  <!--    <property name="expression" value="execution(* *..*ServiceImpl.upgrade*(..))"/>-->
+  <!--  </bean>-->
 
-  <bean id="transactionAdvice" class="springbook.learningtest.jdk.proxy.TransactionAdvice">
-    <property name="transactionManager" ref="transactionManager"/>
-  </bean>
+  <!--  <bean id="transactionAdvice" class="springbook.learningtest.jdk.proxy.TransactionAdvice">-->
+  <!--    <property name="transactionManager" ref="transactionManager"/>-->
+  <!--  </bean>-->
 
-  <bean id="transactionAdvisor" class="org.springframework.aop.support.DefaultPointcutAdvisor">
-    <property name="advice" ref="transactionAdvice"/>
-    <property name="pointcut" ref="transactionPointcut"/>
-  </bean>
+  <!--  <bean id="transactionAdvisor" class="org.springframework.aop.support.DefaultPointcutAdvisor">-->
+  <!--    <property name="advice" ref="transactionAdvice"/>-->
+  <!--    <property name="pointcut" ref="transactionPointcut"/>-->
+  <!--  </bean>-->
 
   <bean id="userService" class="springbook.user.service.UserServiceImpl">
     <property name="userDao" ref="userDaoJdbc"/>
