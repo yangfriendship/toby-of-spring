@@ -26,9 +26,8 @@
   <bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator"/>
 
   <bean id="transactionPointcut"
-    class="springbook.learningtest.jdk.proxy.NameMatchClassMethodPointcut">
-    <property name="mappedName" value="upgrade*"/>
-    <property name="mappedClassName" value="*ServiceImpl"/>
+    class="org.springframework.aop.aspectj.AspectJExpressionPointcut">
+    <property name="expression" value="execution(* *..*ServiceImpl.upgrade*(..))"/>
   </bean>
 
   <bean id="transactionAdvisor" class="org.springframework.aop.support.DefaultPointcutAdvisor">
