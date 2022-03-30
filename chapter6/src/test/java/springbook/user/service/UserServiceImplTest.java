@@ -53,8 +53,6 @@ public class UserServiceImplTest {
     ApplicationContext ctx;
     @Autowired
     UserService testUserService;
-    @Autowired
-    DefaultAdvisorAutoProxyCreator creator;
     List<User> users;
 
     @Before
