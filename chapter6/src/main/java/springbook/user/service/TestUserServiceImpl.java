@@ -3,15 +3,16 @@ package springbook.user.service;
 import org.springframework.transaction.PlatformTransactionManager;
 import springbook.user.domain.User;
 
-public class TestUserService extends UserServiceImpl {
+public class TestUserServiceImpl extends UserServiceImpl {
 
     private String id;
 
-    public TestUserService(String id, PlatformTransactionManager transactionManager) {
-        this.id = id;
-        super.setTransactionManager(transactionManager);
+    public TestUserServiceImpl() {
     }
 
+    public void setId(String id) {
+        this.id = id;
+    }
 
     @Override
     protected void upgradeLevel(User user) {

@@ -8,17 +8,17 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import javax.sql.DataSource;
-import jdk.nashorn.internal.objects.annotations.Getter;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Spy;
 import org.springframework.aop.framework.ProxyFactoryBean;
+import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.mail.MailException;
@@ -28,12 +28,10 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.PlatformTransactionManager;
-import springbook.factorybean.TxProxyFactoryBean;
 import springbook.user.dao.UserDao;
 import springbook.user.domain.Level;
 import springbook.user.domain.User;
-import springbook.user.handler.TransactionHandler;
-import springbook.user.service.TestUserService.TestUserServiceException;
+import springbook.user.service.TestUserServiceImpl.TestUserServiceException;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "/applicationContext.xml")
@@ -44,8 +42,6 @@ public class UserServiceImplTest {
     @Autowired
     UserService userService;
     @Autowired
-    UserServiceImpl userServiceImpl;
-    @Autowired
     UserDao userDao;
     @Autowired
     DataSource dataSource;
@@ -55,6 +51,10 @@ public class UserServiceImplTest {
     MailSender mailSender;
     @Autowired
     ApplicationContext ctx;
+    @Autowired
+    UserService testUserService;
+    @Autowired
+    DefaultAdvisorAutoProxyCreator creator;
     List<User> users;
 
     @Before
@@ -74,7 +74,7 @@ public class UserServiceImplTest {
 
     @Test
     public void init() {
-        assertNotNull(this.userServiceImpl);
+        assertNotNull(this.userService);
         assertEquals(5, this.users.size());
     }
 
@@ -92,17 +92,10 @@ public class UserServiceImplTest {
     @Test
     @DirtiesContext
     public void updateLevelsTest() {
+        this.userDao.deleteAll();
         MockMailSender mockMailSender = new MockMailSender();
-        userServiceImpl.setMailSender(mockMailSender);
         MockUserDao mockUserDao = new MockUserDao(this.users);
-        userServiceImpl.setUserDao(mockUserDao);
-
-//        this.userDao.deleteAll();
-//        for (final User user : this.users) {
-//            this.userDao.add(user);
-//        }
-
-        userServiceImpl.upgradeLevels();
+        this.userService.upgradeLevels();
 
 //        checkLevel(this.users.get(0), false);
 //        checkLevel(this.users.get(1), true);
@@ -110,12 +103,14 @@ public class UserServiceImplTest {
 //        checkLevel(this.users.get(3), true);
 //        checkLevel(this.users.get(4), false);
 
-        List<String> requests = mockMailSender.requests;
-        List<User> upgraded = mockUserDao.getUpgraded();
-        assertEquals(2, upgraded.size());
-        assertEquals(2, requests.size());
-        checkUserAndLevel(upgraded.get(0), this.users.get(1).getName(), Level.SILVER);
-        checkUserAndLevel(upgraded.get(1), this.users.get(3).getName(), Level.GOLD);
+//        verify(this.mailSender, times(2)).send(any(SimpleMailMessage.class));
+
+//        List<String> requests = mockMailSender.requests;
+//        List<User> upgraded = mockUserDao.getUpgraded();
+//        assertEquals(2, upgraded.size());
+//        assertEquals(2, requests.size());
+//        checkUserAndLevel(upgraded.get(0), this.users.get(1).getName(), Level.SILVER);
+//        checkUserAndLevel(upgraded.get(1), this.users.get(3).getName(), Level.GOLD);
     }
 
     @Test
@@ -151,8 +146,8 @@ public class UserServiceImplTest {
         User userWithoutLevel = users.get(0);
         userWithoutLevel.setLevel(null);
 
-        this.userServiceImpl.add(userWithLevel);
-        this.userServiceImpl.add(userWithoutLevel);
+        this.userService.add(userWithLevel);
+        this.userService.add(userWithoutLevel);
 
         User userWithLevelRead = this.userDao.get(userWithLevel.getId());
         User userWithoutLevelRead = this.userDao.get(userWithoutLevel.getId());
@@ -164,27 +159,29 @@ public class UserServiceImplTest {
 
     @Test
     @DirtiesContext
-    public void upgradeAllOrNothing() throws Exception {
+    public void upgradeAllOrNothing() {
         userDao.deleteAll();
 
-        TestUserService testUserService = new TestUserService(users.get(3).getId(),
-            this.transactionManager);
-        testUserService.setUserDao(this.userDao);
-        testUserService.setMailSender(this.mailSender);
+//        testUserService.setUserDao(this.userDao);
+//        testUserService.setMailSender(this.mailSender);
 
-        ProxyFactoryBean factoryBean = this.ctx.getBean("&userService", ProxyFactoryBean.class);
-        factoryBean.setTarget(testUserService);
-        UserService txUserService = (UserService) factoryBean.getObject();
+//        ProxyFactoryBean factoryBean = this.ctx.getBean("&userService", ProxyFactoryBean.class);
+//        factoryBean.setTarget(testUserService);
+//        UserService txUserService = (UserService) factoryBean.getObject();
         for (User user : this.users) {
             this.userDao.add(user);
         }
         try {
-            txUserService.upgradeLevels();
+            this.testUserService.upgradeLevels();
             fail("TestUserServiceException Expected!");
         } catch (TestUserServiceException e) {
             // do nothing...
         }
+        checkLevel(users.get(0), false);
         checkLevel(users.get(1), false);
+        checkLevel(users.get(2), false);
+        checkLevel(users.get(3), false);
+        checkLevel(users.get(4), false);
     }
 
     static class MockMailSender implements MailSender {

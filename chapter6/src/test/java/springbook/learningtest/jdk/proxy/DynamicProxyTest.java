@@ -7,6 +7,7 @@ import org.aopalliance.aop.Advice;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.junit.Test;
+import org.springframework.aop.ClassFilter;
 import org.springframework.aop.framework.ProxyFactoryBean;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
 import org.springframework.aop.support.NameMatchMethodPointcut;
@@ -49,6 +50,31 @@ public class DynamicProxyTest {
         ProxyFactoryBean pfBean = new ProxyFactoryBean();
 
         NameMatchMethodPointcut pointcut = new NameMatchMethodPointcut();
+        pointcut.setMappedName("sayH*");
+
+        DefaultPointcutAdvisor defaultPointcutAdvisor = new DefaultPointcutAdvisor(pointcut,
+            new UppercaseAdvice());
+        pfBean.addAdvisor(defaultPointcutAdvisor);
+        pfBean.setTarget(new HelloTarget());
+
+        Hello hello = (Hello) pfBean.getObject();
+        final String name = "woojung";
+        assertEquals(("hello " + name).toUpperCase(Locale.ROOT), hello.sayHello(name));
+        assertEquals(("Hi " + name).toUpperCase(Locale.ROOT), hello.sayHi(name));
+        //
+        assertEquals("ThankYou " + name, hello.sayThankYou(name));
+    }
+
+    @Test
+    public void classNamePointcutAdvisor() {
+        ProxyFactoryBean pfBean = new ProxyFactoryBean();
+
+        NameMatchMethodPointcut pointcut = new NameMatchMethodPointcut() {
+            @Override
+            public ClassFilter getClassFilter() {
+                return clazz -> clazz.getSimpleName().startsWith("HelloT");
+            }
+        };
         pointcut.setMappedName("sayH*");
 
         DefaultPointcutAdvisor defaultPointcutAdvisor = new DefaultPointcutAdvisor(pointcut,
