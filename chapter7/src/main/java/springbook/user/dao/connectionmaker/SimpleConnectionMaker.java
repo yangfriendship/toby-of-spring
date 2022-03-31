@@ -1,0 +1,23 @@
+package springbook.user.dao.connectionmaker;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
+public class SimpleConnectionMaker implements ConnectionMaker {
+
+    private static final String URL = "jdbc:mysql://localhost/springbook";
+    private static final String USER = "youzheng";
+    private static final String PASSWORD = "youzheng123";
+    public static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
+
+    public SimpleConnectionMaker() {
+    }
+
+    @Override
+    public Connection makeConnections() throws ClassNotFoundException, SQLException {
+        Class.forName(JDBC_DRIVER);
+        return DriverManager.getConnection(URL, USER, PASSWORD);
+    }
+
+}
