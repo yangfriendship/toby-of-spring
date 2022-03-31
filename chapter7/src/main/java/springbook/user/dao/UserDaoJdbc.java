@@ -3,7 +3,9 @@ package springbook.user.dao;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 import javax.sql.DataSource;
+import lombok.Setter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import springbook.user.domain.Level;
@@ -11,6 +13,10 @@ import springbook.user.domain.User;
 
 public class UserDaoJdbc implements UserDao {
 
+    @Setter
+    private String sqlAdd;
+    @Setter
+    private Map<String, String> sqlMap;
     private JdbcTemplate jdbcTemplate;
 
     /*
@@ -32,39 +38,35 @@ public class UserDaoJdbc implements UserDao {
 
     @Override
     public int add(User user) {
-        final String sql = "INSERT INTO USERS (ID, NAME, PASSWORD,LEVEL,LOGIN, RECOMMEND,EMAIL) VALUES (?,?,?,?,?,?,?) ";
-        return this.jdbcTemplate.update(sql, user.getId(), user.getName(), user.getPassword(),
+        return this.jdbcTemplate.update(this.sqlMap.get("add"), user.getId(), user.getName(),
+            user.getPassword(),
             user.getLevel().intValue(), user.getLogin(), user.getRecommend(), user.getEmail());
     }
 
     @Override
     public User get(String id) {
-        final String sql = "SELECT * FROM USERS WHERE ID = ?";
-        return this.jdbcTemplate.queryForObject(sql, new Object[]{id}, this.userRowMapper);
+        return this.jdbcTemplate.queryForObject(this.sqlMap.get("get"), new Object[]{id},
+            this.userRowMapper);
     }
 
     @Override
     public List<User> getAll() {
-        final String sql = "SELECT * FROM USERS ORDER BY ID";
-        return this.jdbcTemplate.query(sql, this.userRowMapper);
+        return this.jdbcTemplate.query(this.sqlMap.get("getAll"), this.userRowMapper);
     }
 
     @Override
     public int deleteAll() {
-        final String sql = "delete from USERS;";
-        return this.jdbcTemplate.update(sql);
+        return this.jdbcTemplate.update(this.sqlMap.get("deleteAll"));
     }
 
     @Override
     public int getCount() {
-        final String sql = "SELECT COUNT(*) FROM USERS";
-        return this.jdbcTemplate.queryForInt(sql);
+        return this.jdbcTemplate.queryForInt(this.sqlMap.get("getCount"));
     }
 
     @Override
     public int update(User user) {
-        final String sql = "UPDATE USERS SET NAME = ?, PASSWORD =? , LEVEL = ? , LOGIN = ? , RECOMMEND = ?, EMAIL = ? WHERE ID = ?";
-        return this.jdbcTemplate.update(sql,
+        return this.jdbcTemplate.update(this.sqlMap.get("update"),
             user.getName(), user.getPassword(), user.getLevel().intValue(), user.getLogin(),
             user.getRecommend(), user.getEmail(), user.getId()
         );
