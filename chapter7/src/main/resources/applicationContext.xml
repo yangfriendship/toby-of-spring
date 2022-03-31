@@ -69,16 +69,18 @@
 
   <bean id="userDaoJdbc" class="springbook.user.dao.UserDaoJdbc">
     <property name="dataSource" ref="dataSource"/>
-    <property name="sqlAdd"
-      value="INSERT INTO USERS (ID, NAME, PASSWORD,LEVEL,LOGIN, RECOMMEND,EMAIL) VALUES (?,?,?,?,?,?,?) "/>
+    <property name="sqlService" ref="sqlService"/>
+  </bean>
+
+  <bean id="sqlService" class="springbook.user.sqlservice.SqlServiceImpl">
     <property name="sqlMap">
       <map>
-        <entry key="add" value="INSERT INTO USERS (ID, NAME, PASSWORD,LEVEL,LOGIN, RECOMMEND,EMAIL) VALUES (?,?,?,?,?,?,?) "/>
-        <entry key="getAll" value="SELECT * FROM USERS ORDER BY ID"/>
-        <entry key="get" value="SELECT * FROM USERS WHERE ID = ?"/>
-        <entry key="deleteAll" value="DELETE FROM USERS;"/>
-        <entry key="getCount" value="SELECT COUNT(*) FROM USERS"/>
-        <entry key="update" value="UPDATE USERS SET NAME = ?, PASSWORD =? , LEVEL = ? , LOGIN = ? , RECOMMEND = ?, EMAIL = ? WHERE ID = ?"/>
+        <entry key="userAdd" value="INSERT INTO USERS (ID, NAME, PASSWORD,LEVEL,LOGIN, RECOMMEND,EMAIL) VALUES (?,?,?,?,?,?,?) "/>
+        <entry key="userGetAll" value="SELECT * FROM USERS ORDER BY ID"/>
+        <entry key="userGet" value="SELECT * FROM USERS WHERE ID = ?"/>
+        <entry key="userDeleteAll" value="DELETE FROM USERS;"/>
+        <entry key="userGetCount" value="SELECT COUNT(*) FROM USERS"/>
+        <entry key="userUpdate" value="UPDATE USERS SET NAME = ?, PASSWORD =? , LEVEL = ? , LOGIN = ? , RECOMMEND = ?, EMAIL = ? WHERE ID = ?"/>
       </map>
     </property>
   </bean>
