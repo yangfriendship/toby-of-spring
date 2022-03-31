@@ -72,18 +72,7 @@
     <property name="sqlService" ref="sqlService"/>
   </bean>
 
-  <bean id="sqlService" class="springbook.user.sqlservice.SqlServiceImpl">
-    <property name="sqlMap">
-      <map>
-        <entry key="userAdd" value="INSERT INTO USERS (ID, NAME, PASSWORD,LEVEL,LOGIN, RECOMMEND,EMAIL) VALUES (?,?,?,?,?,?,?) "/>
-        <entry key="userGetAll" value="SELECT * FROM USERS ORDER BY ID"/>
-        <entry key="userGet" value="SELECT * FROM USERS WHERE ID = ?"/>
-        <entry key="userDeleteAll" value="DELETE FROM USERS;"/>
-        <entry key="userGetCount" value="SELECT COUNT(*) FROM USERS"/>
-        <entry key="userUpdate" value="UPDATE USERS SET NAME = ?, PASSWORD =? , LEVEL = ? , LOGIN = ? , RECOMMEND = ?, EMAIL = ? WHERE ID = ?"/>
-      </map>
-    </property>
-  </bean>
+  <bean id="sqlService" class="springbook.user.sqlservice.XmlSqlService"/>
 
   <bean id="connectionMaker" class="springbook.user.dao.connectionmaker.SimpleConnectionMaker"/>
 
