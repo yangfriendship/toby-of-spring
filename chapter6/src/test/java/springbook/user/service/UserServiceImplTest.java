@@ -21,6 +21,7 @@ import org.springframework.aop.framework.ProxyFactoryBean;
 import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.dao.TransientDataAccessResourceException;
 import org.springframework.mail.MailException;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
@@ -180,6 +181,11 @@ public class UserServiceImplTest {
         checkLevel(users.get(2), false);
         checkLevel(users.get(3), false);
         checkLevel(users.get(4), false);
+    }
+
+    @Test(expected = TransientDataAccessResourceException.class)
+    public void getAllReadOnlyTest() {
+        this.testUserService.getAll();
     }
 
     static class MockMailSender implements MailSender {

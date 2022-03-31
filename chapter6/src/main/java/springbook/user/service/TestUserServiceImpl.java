@@ -1,6 +1,6 @@
 package springbook.user.service;
 
-import org.springframework.transaction.PlatformTransactionManager;
+import java.util.List;
 import springbook.user.domain.User;
 
 public class TestUserServiceImpl extends UserServiceImpl {
@@ -12,6 +12,15 @@ public class TestUserServiceImpl extends UserServiceImpl {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    @Override
+    public List<User> getAll() {
+        final List<User> users = super.getAll();
+        for (User user : users) {
+            super.update(user);
+        }
+        return users;
     }
 
     @Override

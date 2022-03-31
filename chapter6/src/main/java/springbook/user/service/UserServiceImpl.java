@@ -5,8 +5,6 @@ import lombok.Setter;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.DefaultTransactionDefinition;
 import springbook.user.dao.UserDao;
 import springbook.user.domain.Level;
 import springbook.user.domain.User;
@@ -76,5 +74,25 @@ public class UserServiceImpl implements UserService {
             user.setLevel(DEFAULT_LEVEL);
         }
         this.userDao.add(user);
+    }
+
+    @Override
+    public User get(String id) {
+        return this.userDao.get(id);
+    }
+
+    @Override
+    public List<User> getAll() {
+        return this.userDao.getAll();
+    }
+
+    @Override
+    public void deleteAll() {
+        this.userDao.deleteAll();
+    }
+
+    @Override
+    public void update(User user) {
+        this.userDao.update(user);
     }
 }
