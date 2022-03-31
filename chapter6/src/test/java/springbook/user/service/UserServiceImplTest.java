@@ -29,6 +29,9 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 import springbook.user.dao.UserDao;
 import springbook.user.domain.Level;
 import springbook.user.domain.User;
@@ -159,7 +162,7 @@ public class UserServiceImplTest {
     @Test
     @DirtiesContext
     public void upgradeAllOrNothing() {
-        userDao.deleteAll();
+        this.userService.deleteAll();
 
 //        testUserService.setUserDao(this.userDao);
 //        testUserService.setMailSender(this.mailSender);
@@ -183,10 +186,25 @@ public class UserServiceImplTest {
         checkLevel(users.get(4), false);
     }
 
-    @Test(expected = TransientDataAccessResourceException.class)
-    public void getAllReadOnlyTest() {
-        this.testUserService.getAll();
+    @Test
+    public void transactionSync() {
+        this.userService.deleteAll();
+        this.userService.add(this.users.get(0));
+        int count = this.userService.getCount();
+        assertEquals(1, count);
+        DefaultTransactionDefinition definition = new DefaultTransactionDefinition();
+        TransactionStatus transaction = this.transactionManager.getTransaction(definition);
+        this.userService.deleteAll();
+
+        this.userService.add(this.users.get(1));
+        this.userService.add(this.users.get(2));
+
+        this.transactionManager.rollback(transaction);
+
+        assertEquals(1, count);
+        transaction.flush();
     }
+
 
     static class MockMailSender implements MailSender {
 

@@ -76,6 +76,11 @@ public class UserServiceTx implements UserService {
     }
 
     @Override
+    public int getCount() {
+        return this.userService.getCount();
+    }
+
+    @Override
     public void deleteAll() {
         DefaultTransactionDefinition definition = new DefaultTransactionDefinition();
         TransactionStatus status = this.transactionManager.getTransaction(

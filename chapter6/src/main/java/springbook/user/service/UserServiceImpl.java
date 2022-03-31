@@ -87,6 +87,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public int getCount() {
+        return this.userDao.getCount();
+    }
+
+    @Override
     public void deleteAll() {
         this.userDao.deleteAll();
     }
