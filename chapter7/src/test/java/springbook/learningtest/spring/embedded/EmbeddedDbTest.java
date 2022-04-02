@@ -14,22 +14,22 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 
 public class EmbeddedDbTest {
 
-    EmbeddedDatabase database;
+    EmbeddedDatabase embeddedDatabase;
     SimpleJdbcTemplate jdbcTemplate;
 
     @Before
     public void setup() {
-        this.database = new EmbeddedDatabaseBuilder()
+        this.embeddedDatabase = new EmbeddedDatabaseBuilder()
             .setType(H2)
             .addScript("classpath:/sql/schema.sql")
             .addScript("classpath:/sql/data.sql")
             .build();
-        this.jdbcTemplate = new SimpleJdbcTemplate(this.database);
+        this.jdbcTemplate = new SimpleJdbcTemplate(this.embeddedDatabase);
     }
 
     @After
     public void tearDown() {
-        this.database.shutdown();
+        this.embeddedDatabase.shutdown();
     }
 
     @Test

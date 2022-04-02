@@ -2,22 +2,24 @@ package springbook.user.service;
 
 import java.util.List;
 import lombok.Setter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
-import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.stereotype.Service;
 import springbook.user.dao.UserDao;
 import springbook.user.domain.Level;
 import springbook.user.domain.User;
 
+@Service("userService")
 public class UserServiceImpl implements UserService {
 
     private static Level DEFAULT_LEVEL = Level.BASIC;
 
     @Setter
+    @Autowired
     private UserDao userDao;
     @Setter
-    private PlatformTransactionManager transactionManager;
-    @Setter
+    @Autowired
     private MailSender mailSender;
 
     @Override

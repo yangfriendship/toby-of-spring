@@ -2,8 +2,6 @@ package springbook.user.dao;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNotSame;
-import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -13,11 +11,9 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
-import java.util.function.Predicate;
 import javax.sql.DataSource;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -27,11 +23,11 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import springbook.user.dao.connectionmaker.ConnectionMaker;
 import springbook.user.domain.Level;
 import springbook.user.domain.User;
 
 @RunWith(SpringJUnit4ClassRunner.class)
+//@ContextConfiguration(classes = TestApplicationContext.class)
 @ContextConfiguration(locations = "/applicationContext.xml")
 public class UserDaoTest {
 
@@ -72,15 +68,6 @@ public class UserDaoTest {
     }
 
     @Test
-    public void daoFactoryTest() {
-        UserDao userDaoJdbc = this.context.getBean("userDaoJdbc", UserDao.class);
-        ConnectionMaker connectionMaker = this.context.getBean("connectionMaker",
-            ConnectionMaker.class);
-        assertNotNull(userDaoJdbc);
-        assertNotNull(connectionMaker);
-    }
-
-    @Test
     public void addAndGetTest() throws Exception {
         this.userDao.deleteAll();
         assertEquals(0, this.userDao.getCount());
@@ -97,18 +84,6 @@ public class UserDaoTest {
         assertThrows(EmptyResultDataAccessException.class, () -> {
             User find = this.userDao.get(this.user.getId());
         });
-    }
-
-    @Test
-    public void singletonTest() {
-        DaoFactory daoFactory = new DaoFactory();
-        UserDao userDaoJdbc1 = daoFactory.userDao();
-        UserDao userDaoJdbc2 = daoFactory.userDao();
-        assertNotSame(userDaoJdbc1, userDaoJdbc2);
-
-        UserDao userDaoJdbc3 = this.context.getBean("userDaoJdbc", UserDao.class);
-        UserDao userDaoJdbc4 = this.context.getBean("userDaoJdbc", UserDao.class);
-        assertSame(userDaoJdbc3, userDaoJdbc4);
     }
 
     @Test

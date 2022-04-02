@@ -3,23 +3,37 @@ package springbook.user.dao;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Map;
 import javax.sql.DataSource;
-import lombok.Setter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import springbook.user.domain.Level;
 import springbook.user.domain.User;
 import springbook.user.sqlservice.SqlService;
 
+//@Repository("userDao")
+@Repository
 public class UserDaoJdbc implements UserDao {
 
-    @Setter
-    private Map<String, String> sqlMap;
-    @Setter
+    @Autowired
     private SqlService sqlService;
 
     private JdbcTemplate jdbcTemplate;
+
+    public void setSqlService(SqlService sqlService) {
+        this.sqlService = sqlService;
+    }
+
+    @Autowired
+    public void setDataSource(DataSource dataSource) {
+        System.out.println("Setting 작동함");
+        this.jdbcTemplate = new JdbcTemplate(dataSource);
+        System.out.println(this.jdbcTemplate);
+    }
+
 
     /*
      * 익명 클래스로 만들면 Junit 인식하지만, 람다로 만들면 예외가 발생한다.
@@ -33,10 +47,6 @@ public class UserDaoJdbc implements UserDao {
             return user;
         }
     };
-
-    public void setDataSource(DataSource dataSource) {
-        this.jdbcTemplate = new JdbcTemplate(dataSource);
-    }
 
     @Override
     public int add(User user) {
@@ -58,7 +68,8 @@ public class UserDaoJdbc implements UserDao {
 
     @Override
     public int deleteAll() {
-        return this.jdbcTemplate.update(this.sqlService.getSql("userDeleteAll"));
+        String userDeleteAll = this.sqlService.getSql("userDeleteAll");
+        return this.jdbcTemplate.update(userDeleteAll);
     }
 
     @Override

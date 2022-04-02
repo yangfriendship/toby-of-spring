@@ -1,9 +1,10 @@
 package springbook.user.service;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -11,17 +12,16 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import javax.annotation.Resource;
 import javax.sql.DataSource;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Spy;
-import org.springframework.aop.framework.ProxyFactoryBean;
-import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.dao.TransientDataAccessResourceException;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.mail.MailException;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
@@ -30,15 +30,15 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
+import springbook.TestApplicationContext;
 import springbook.user.dao.UserDao;
 import springbook.user.domain.Level;
 import springbook.user.domain.User;
 import springbook.user.service.TestUserServiceImpl.TestUserServiceException;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "/applicationContext.xml")
+@ContextConfiguration(classes = TestApplicationContext.class)
 public class UserServiceImplTest {
 
     public static final int MIN_LOGCOUNT_FOR_SILVER = 50;
@@ -57,6 +57,8 @@ public class UserServiceImplTest {
     ApplicationContext ctx;
     @Autowired
     UserService testUserService;
+    @Resource
+    EmbeddedDatabase embeddedDatabase;
     List<User> users;
 
     @Before
@@ -76,6 +78,8 @@ public class UserServiceImplTest {
 
     @Test
     public void init() {
+        this.userDao.deleteAll();
+
         assertNotNull(this.userService);
         assertEquals(5, this.users.size());
     }
@@ -95,34 +99,19 @@ public class UserServiceImplTest {
     @DirtiesContext
     public void updateLevelsTest() {
         this.userDao.deleteAll();
-        MockMailSender mockMailSender = new MockMailSender();
-        MockUserDao mockUserDao = new MockUserDao(this.users);
+        for (User user : this.users) {
+            this.userDao.add(user);
+        }
         this.userService.upgradeLevels();
-
-//        checkLevel(this.users.get(0), false);
-//        checkLevel(this.users.get(1), true);
-//        checkLevel(this.users.get(2), false);
-//        checkLevel(this.users.get(3), true);
-//        checkLevel(this.users.get(4), false);
-
-//        verify(this.mailSender, times(2)).send(any(SimpleMailMessage.class));
-
-//        List<String> requests = mockMailSender.requests;
-//        List<User> upgraded = mockUserDao.getUpgraded();
-//        assertEquals(2, upgraded.size());
-//        assertEquals(2, requests.size());
-//        checkUserAndLevel(upgraded.get(0), this.users.get(1).getName(), Level.SILVER);
-//        checkUserAndLevel(upgraded.get(1), this.users.get(3).getName(), Level.GOLD);
     }
 
     @Test
     public void mockUpgradeLevel() {
+
         // given
         UserDao mockUserDao = mock(UserDao.class);
-        PlatformTransactionManager transactionManager = mock(PlatformTransactionManager.class);
         MailSender mailSender = mock(MailSender.class);
         UserServiceImpl userService = new UserServiceImpl();
-        userService.setTransactionManager(transactionManager);
         userService.setUserDao(mockUserDao);
         userService.setMailSender(mailSender);
         ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);

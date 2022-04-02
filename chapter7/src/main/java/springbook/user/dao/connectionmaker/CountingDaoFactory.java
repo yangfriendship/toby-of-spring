@@ -7,27 +7,27 @@ import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import springbook.user.dao.UserDao;
 import springbook.user.dao.UserDaoJdbc;
 
-@Configuration
+//@Configuration
 public class CountingDaoFactory {
 
-    @Bean
+//    @Bean
     public UserDao userDao() {
         UserDaoJdbc userDaoJdbc = new UserDaoJdbc();
         userDaoJdbc.setDataSource(dataSource());
         return userDaoJdbc;
     }
 
-    @Bean
+//    @Bean
     public ConnectionMaker connectionMaker() {
         return new SimpleConnectionMaker();
     }
 
-    @Bean
+//    @Bean
     public ConnectionMaker countingConnectionMaker() {
         return new CountingConnectionMaker(connectionMaker());
     }
 
-    @Bean
+//    @Bean
     public DataSource dataSource() {
         SimpleDriverDataSource dataSource = new SimpleDriverDataSource();
         dataSource.setDriverClass(com.mysql.cj.jdbc.Driver.class);
