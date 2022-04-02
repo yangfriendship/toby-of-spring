@@ -14,7 +14,6 @@ import java.util.Arrays;
 import java.util.List;
 import javax.annotation.Resource;
 import javax.sql.DataSource;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,14 +30,15 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
-import springbook.TestApplicationContext;
+import springbook.AppContext;
+import springbook.config.TestAppContext;
 import springbook.user.dao.UserDao;
 import springbook.user.domain.Level;
 import springbook.user.domain.User;
 import springbook.user.service.TestUserServiceImpl.TestUserServiceException;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = TestApplicationContext.class)
+@ContextConfiguration(classes = {AppContext.class, TestAppContext.class})
 public class UserServiceImplTest {
 
     public static final int MIN_LOGCOUNT_FOR_SILVER = 50;
