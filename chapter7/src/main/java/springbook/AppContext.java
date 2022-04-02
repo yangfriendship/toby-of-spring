@@ -1,6 +1,7 @@
 package springbook;
 
 import javax.sql.DataSource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -21,23 +22,16 @@ import springbook.user.service.TestUserServiceImpl;
 @Configuration
 @EnableTransactionManagement // <tx:annotation-driven/>
 @ComponentScan(basePackages = "springbook.user")
-@Import({SqlServiceContext.class})
+@Import({SqlServiceContext.class, DataSourceConfig.class})
 public class AppContext {
 
-    @Bean
-    public DataSource dataSource() {
-        SimpleDriverDataSource dataSource = new SimpleDriverDataSource();
-        dataSource.setDriverClass(com.mysql.jdbc.Driver.class);
-        dataSource.setUrl("jdbc:mysql://localhost/springbook");
-        dataSource.setUsername("youzheng");
-        dataSource.setPassword("youzheng123");
-        return dataSource;
-    }
+    @Autowired
+    private DataSource dataSource;
 
     @Bean
     public PlatformTransactionManager transactionManager() {
         DataSourceTransactionManager transactionManager = new DataSourceTransactionManager();
-        transactionManager.setDataSource(dataSource());
+        transactionManager.setDataSource(this.dataSource);
         return transactionManager;
     }
 
