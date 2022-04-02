@@ -2,6 +2,7 @@ package springbook.user.dao;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.support.GenericXmlApplicationContext;
 import springbook.user.dao.connectionmaker.ConnectionMaker;
@@ -9,6 +10,7 @@ import springbook.user.dao.connectionmaker.SimpleConnectionMaker;
 
 class XmlUserDaoJdbcTest {
 
+    @Disabled
     @Test
     void xmlTest() {
         GenericXmlApplicationContext context = new GenericXmlApplicationContext(
