@@ -45,9 +45,10 @@
 
   <bean id="sqlService" class="springbook.user.sqlservice.OxmSqlService">
     <property name="unmarshaller" ref="unmarshaller"/>
-    <property name="sqlmap" value="classpath:sqlmap.xml"/>
-    <!--    <property name="sqlmap" value="file:/Users/youzheng/Desktop/sqlmap.xml"/>-->
+    <property name="sqlRegistry" ref="concurrentSqlRegister"/>
   </bean>
+
+  <bean id="concurrentSqlRegister" class="springbook.user.sqlservice.ConcurrentHashMapSqlRegistry"/>
 
   <bean id="sqlReader" class="springbook.user.sqlservice.JaxbSqlReader">
     <property name="sqlmapFile" value="/sqlmap.xml"/>

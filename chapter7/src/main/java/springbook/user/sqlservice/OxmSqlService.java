@@ -26,6 +26,10 @@ public class OxmSqlService implements SqlService {
         this.oxmSqlReader.setSqlmap(sqlmap);
     }
 
+    public void setSqlRegistry(SqlRegistry sqlRegistry) {
+        this.sqlRegistry = sqlRegistry;
+    }
+
     @Setter
     private static class OxmSqlReader implements SqlReader {
 
@@ -46,7 +50,7 @@ public class OxmSqlService implements SqlService {
                     sqlRegistry.registerSql(sqlType.getKey(), sqlType.getValue());
                 }
             } catch (IOException e) {
-                throw new IllegalArgumentException(this.sqlmap.getFilename() + "을 가져올 수 없습니다.",e);
+                throw new IllegalArgumentException(this.sqlmap.getFilename() + "을 가져올 수 없습니다.", e);
             }
         }
     }
