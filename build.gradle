@@ -10,6 +10,7 @@ subprojects {
 
     dependencies {
         implementation 'junit:junit:4.13.1'
+        implementation 'org.projectlombok:lombok:1.18.20'
 
         /* Test */
         testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
@@ -22,7 +23,7 @@ subprojects {
         implementation 'org.springframework:spring-core:4.0.3.RELEASE'
         implementation 'org.springframework:spring-beans:4.0.3.RELEASE'
         implementation 'org.springframework:spring-jdbc:4.0.3.RELEASE'
-        implementation 'org.springframework:spring-asm:4.0.3.RELEASE'
+        implementation 'org.springframework:spring-asm:3.1.4.RELEASE'
         implementation 'org.springframework:spring-oxm:4.0.3.RELEASE'
         implementation 'org.springframework:spring-context-support:4.0.3.RELEASE'
         implementation 'org.springframework:spring-expression:4.0.3.RELEASE'
