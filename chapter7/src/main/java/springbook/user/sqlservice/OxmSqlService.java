@@ -5,6 +5,8 @@ import javax.annotation.PostConstruct;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 import lombok.Setter;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.oxm.Unmarshaller;
 import springbook.user.sqlservice.jaxb.SqlType;
 import springbook.user.sqlservice.jaxb.Sqlmap;
@@ -20,28 +22,31 @@ public class OxmSqlService implements SqlService {
         this.oxmSqlReader.setUnmarshaller(unmarshaller);
     }
 
-    public void setSqlmapFile(String sqlmapFile) {
-        this.oxmSqlReader.setSqlmapFile(sqlmapFile);
+    public void setSqlmap(Resource sqlmap) {
+        this.oxmSqlReader.setSqlmap(sqlmap);
     }
 
     @Setter
     private static class OxmSqlReader implements SqlReader {
 
         private Unmarshaller unmarshaller;
-        private static final String DEFAULT_SQL_MAP_FILE = "/sqlmap.xml";
-        private String sqlmapFile = DEFAULT_SQL_MAP_FILE;
+        public Resource sqlmap = new ClassPathResource("/sqlmap.xml");
+
+        public void setSqlmap(Resource sqlmap) {
+            this.sqlmap = sqlmap;
+        }
 
         @Override
         public void read(SqlRegistry sqlRegistry) {
 
-            Source source = new StreamSource(getClass().getResourceAsStream(this.sqlmapFile));
             try {
+                Source source = new StreamSource(this.sqlmap.getInputStream());
                 Sqlmap sqlmap = (Sqlmap) (this.unmarshaller.unmarshal(source));
                 for (SqlType sqlType : sqlmap.getSql()) {
                     sqlRegistry.registerSql(sqlType.getKey(), sqlType.getValue());
                 }
             } catch (IOException e) {
-                throw new IllegalArgumentException(this.sqlmapFile + "을 가져올 수 없습니다.", e);
+                throw new IllegalArgumentException(this.sqlmap.getFilename() + "을 가져올 수 없습니다.",e);
             }
         }
     }

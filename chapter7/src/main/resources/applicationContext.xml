@@ -45,17 +45,19 @@
 
   <bean id="sqlService" class="springbook.user.sqlservice.OxmSqlService">
     <property name="unmarshaller" ref="unmarshaller"/>
+    <property name="sqlmap" value="classpath:sqlmap.xml"/>
+    <!--    <property name="sqlmap" value="file:/Users/youzheng/Desktop/sqlmap.xml"/>-->
   </bean>
 
   <bean id="sqlReader" class="springbook.user.sqlservice.JaxbSqlReader">
-      <property name="sqlmapFile" value="/sqlmap.xml"/>
+    <property name="sqlmapFile" value="/sqlmap.xml"/>
   </bean>
   <bean id="sqlRegistry" class="springbook.user.sqlservice.HashMapSqlRegistry"/>
 
   <bean id="connectionMaker" class="springbook.user.dao.connectionmaker.SimpleConnectionMaker"/>
 
   <bean id="unmarshaller" class="org.springframework.oxm.jaxb.Jaxb2Marshaller">
-    <property name="contextPath" value="springbook.user.sqlservice.jaxb" />
+    <property name="contextPath" value="springbook.user.sqlservice.jaxb"/>
   </bean>
 
   <bean id="dataSource" class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
