@@ -12,6 +12,14 @@ public class Hello {
 
     private Printer printer;
 
+    public Hello() {
+    }
+
+    public Hello(String name, Printer printer) {
+        this.name = name;
+        this.printer = printer;
+    }
+
     public String sayHello() {
         return "Hello " + this.name;
     }
