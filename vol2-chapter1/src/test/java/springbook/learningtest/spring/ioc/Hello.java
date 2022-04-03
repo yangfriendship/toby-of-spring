@@ -13,7 +13,7 @@ public class Hello {
     private Printer printer;
 
     public String sayHello() {
-        return "Hello" + this.name;
+        return "Hello " + this.name;
     }
 
     public void print() {

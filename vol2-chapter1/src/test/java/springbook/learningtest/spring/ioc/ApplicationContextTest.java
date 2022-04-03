@@ -99,4 +99,21 @@ public class ApplicationContextTest {
         assertTrue(printer instanceof StringPrinter);
     }
 
+    @Test
+    public void parentChildContextTest() {
+        GenericXmlApplicationContext parentContext = new GenericXmlApplicationContext(
+            "/parentContext.xml");
+
+        GenericApplicationContext childContext = new GenericApplicationContext(
+            parentContext);
+
+        XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(childContext);
+        reader.loadBeanDefinitions("/childContext.xml");
+        childContext.refresh();
+
+        Hello hello = childContext.getBean("hello", Hello.class);
+        assertNotNull(hello);
+        assertEquals("Hello child", hello.sayHello());
+    }
+
 }
