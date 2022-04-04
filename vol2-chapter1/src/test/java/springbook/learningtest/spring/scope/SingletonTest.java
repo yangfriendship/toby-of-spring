@@ -1,8 +1,10 @@
 package springbook.learningtest.spring.scope;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -36,6 +38,15 @@ public class SingletonTest {
         public PrototypeBean prototypeBean() {
             return new PrototypeBean();
         }
+
+        @Bean
+        public PrototypeBeanClient prototypeBeanClient() {
+            PrototypeBeanClient beanClient = new PrototypeBeanClient();
+            beanClient.setBean1(prototypeBean());
+            beanClient.setBean2(prototypeBean());
+            return beanClient;
+        }
+
     }
 
     static class SingletonBean {
@@ -53,6 +64,17 @@ public class SingletonTest {
         SingletonBean bean2;
     }
 
+    @Component
+    @Getter
+    @Setter
+    static class PrototypeBeanClient {
+
+        @Autowired
+        PrototypeBean bean1;
+        @Autowired
+        PrototypeBean bean2;
+    }
+
     static class PrototypeBean {
 
     }
@@ -61,8 +83,6 @@ public class SingletonTest {
     public void singletonScope() {
         AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(
             SingletonConfig.class);
-
-        Set<SingletonBean> singletonBeans = new HashSet<>();
 
         SingletonBean bean1 = context.getBean("bean", SingletonBean.class);
         SingletonBean bean2 = context.getBean("bean", SingletonBean.class);
@@ -82,9 +102,16 @@ public class SingletonTest {
         AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(
             SingletonConfig.class);
 
-        PrototypeBean bean1 = context.getBean( PrototypeBean.class);
-        PrototypeBean bean2 = context.getBean( PrototypeBean.class);
+        PrototypeBean bean1 = context.getBean("prototypeBean", PrototypeBean.class);
+        PrototypeBean bean2 = context.getBean("prototypeBean", PrototypeBean.class);
         assertNotSame(bean1, bean2);
+        assertNotNull(bean1);
+        assertTrue(bean1 instanceof PrototypeBean);
+        assertNotNull(bean1);
+        assertTrue(bean2 instanceof PrototypeBean);
+
+        PrototypeBeanClient client = context.getBean(PrototypeBeanClient.class);
+        assertNotSame(client.getBean1(), client.getBean2());
     }
 
 }
