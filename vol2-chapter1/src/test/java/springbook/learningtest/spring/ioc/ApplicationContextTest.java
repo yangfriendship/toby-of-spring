@@ -2,7 +2,6 @@ package springbook.learningtest.spring.ioc;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.junit.Test;
@@ -18,6 +17,7 @@ import springbook.learningtest.spring.ioc.bean.annotation.AnnotatedHello;
 import springbook.learningtest.spring.ioc.bean.annotation.AnnotatedHelloConfig;
 import springbook.learningtest.spring.ioc.bean.annotation.HelloCollection;
 import springbook.learningtest.spring.ioc.bean.annotation.MethodAutowireHelloConfig;
+import springbook.learningtest.spring.ioc.bean.example.SystemPropertiesConfig;
 import springbook.learningtest.spring.ioc.bean.example.QualifierHelloCollection;
 import springbook.learningtest.spring.ioc.bean.example.QualifierHelloService;
 import springbook.learningtest.spring.ioc.bean.example.NotConfigAnnotatedConfig;
@@ -279,6 +279,30 @@ public class ApplicationContextTest {
         assertNotNull(list);
         assertEquals(3, list.size());
 
+    }
+
+    @Test
+    public void systemEnvironmentAndPropertyTest() {
+        ApplicationContext context = new GenericXmlApplicationContext(
+            "/genericApplicationContext.xml");
+        Map<String, String> systemProperties = context.getBean("systemProperties", Map.class);
+        Map systemEnvironment = context.getBean("systemEnvironment", Map.class);
+
+        assertNotNull(systemEnvironment);
+        assertFalse(systemEnvironment.isEmpty());
+        assertNotNull(systemProperties);
+        assertFalse(systemProperties.isEmpty());
+    }
+
+    @Test
+    public void systemPropertiesAndValueDiTest() {
+        ApplicationContext context = new GenericXmlApplicationContext(
+            "/genericApplicationContext.xml");
+
+        SystemPropertiesConfig bean = context.getBean(SystemPropertiesConfig.class);
+
+        assertNotNull(bean);
+        assertNotNull(bean.getOsName());
     }
 
 }
