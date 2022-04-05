@@ -2,7 +2,6 @@ package springbook.learningtest.spring.ioc.bean.example;
 
 import lombok.Setter;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 import springbook.learningtest.spring.ioc.Hello;
 import springbook.learningtest.spring.ioc.Printer;

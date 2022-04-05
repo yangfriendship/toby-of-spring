@@ -6,7 +6,6 @@ import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import springbook.learningtest.spring.ioc.Hello;
 
 @Configuration
 public class SimpleConfig {
