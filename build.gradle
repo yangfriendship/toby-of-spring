@@ -27,6 +27,8 @@ subprojects {
         implementation 'org.springframework:spring-oxm:4.0.3.RELEASE'
         implementation 'org.springframework:spring-context-support:4.0.3.RELEASE'
         implementation 'org.springframework:spring-expression:4.0.3.RELEASE'
+        implementation 'org.springframework:spring-webmvc:4.0.3.RELEASE'
+
 
         implementation 'cglib:cglib:2.2'
         implementation 'cglib:cglib-nodep:2.2'
