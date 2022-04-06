@@ -2,19 +2,14 @@ package springbook.learningtest.spring.jdbc;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
@@ -30,10 +25,16 @@ import springbook.learningtest.spring.jdbc.entity.Member;
 @ContextConfiguration(classes = AppConfig.class)
 public class MemberDaoTest {
 
+    private MemberTestUtil memberTestUtil;
     @Autowired
     MemberDao memberDao;
     @Autowired
     SimpleJdbcTemplate template;
+
+    @Before
+    public void setup() {
+        this.memberTestUtil = new MemberTestUtil(this.template);
+    }
 
     @Test
     public void initTest() {
@@ -68,7 +69,7 @@ public class MemberDaoTest {
 
     @Test
     public void insertTest_beanPropertySqlParameterSource() throws Exception {
-        insertOnMember();
+        memberTestUtil.insertOnMember();
     }
 
     @Test
@@ -86,6 +87,9 @@ public class MemberDaoTest {
 
     @Test
     public void queryForInt_mapSqlParameterSource() {
+        this.memberTestUtil.insertOnMember();
+        this.memberTestUtil.insertOnMember();
+        this.memberTestUtil.insertOnMember();
 
         int min = this.template.queryForInt("select count(*) from member where point > :min;",
             new MapSqlParameterSource("min", 0));
@@ -100,7 +104,7 @@ public class MemberDaoTest {
      * */
     @Test
     public void queryForObjectTest() {
-        Member member = insertOnMember();
+        Member member = memberTestUtil.insertOnMember();
 
         String name = this.template.queryForObject("select name from member where id = ?",
             String.class, member.getId());
@@ -110,7 +114,7 @@ public class MemberDaoTest {
 
     @Test(expected = EmptyResultDataAccessException.class)
     public void queryForObjectTest_EmptyResultDataAccessException() {
-        Member member = insertOnMember();
+        Member member = memberTestUtil.insertOnMember();
 
         String name = this.template.queryForObject("select name from member where id = ?",
             String.class, "HIYO~");
@@ -120,18 +124,18 @@ public class MemberDaoTest {
 
     @Test
     public void queryForObjectTest_BeanPropertyRowMapper() {
-        Member member = insertOnMember();
+        Member member = memberTestUtil.insertOnMember();
 
         Member result = this.template.queryForObject(
             "select id,name,point from member where id = ?",
             new BeanPropertyRowMapper<>(Member.class), member.getId());
 
-        assertEqualsMember(member, result);
+        this.memberTestUtil.assertEqualsMember(member, result);
     }
 
     @Test
     public void queryForObjectTest_implementRowMapper() {
-        Member member = insertOnMember();
+        Member member = this.memberTestUtil.insertOnMember();
 
         Member result = this.template.queryForObject(
             "select id,name,point from member where id = ?",
@@ -143,7 +147,7 @@ public class MemberDaoTest {
                 return result1;
             }, member.getId());
 
-        assertEqualsMember(member, result);
+        this.memberTestUtil.assertEqualsMember(member, result);
     }
 
     /*
@@ -151,7 +155,7 @@ public class MemberDaoTest {
      * */
     @Test
     public void queryTest() {
-        Member member = insertOnMember();
+        Member member = this.memberTestUtil.insertOnMember();
 
         List<Member> result = this.template.query(
             "select id,name,point from member where id = ?",
@@ -166,7 +170,7 @@ public class MemberDaoTest {
         assertNotEquals(0, result.size());
         Member findMember = result.stream().filter(m -> m.getId() == member.getId()).findFirst()
             .get();
-        assertEqualsMember(member, findMember);
+        this.memberTestUtil.assertEqualsMember(member, findMember);
     }
 
     /*
@@ -174,36 +178,40 @@ public class MemberDaoTest {
      * */
     @Test
     public void queryForMapTest() {
-        Member member = insertOnMember();
+        Member member = this.memberTestUtil.insertOnMember();
         Map<String, Object> result = this.template.queryForMap(
             "select * from member where id = ?", member.getId());
         Member fromDb = new Member((Integer) result.get("id"), (String) result.get("name"),
             (Double) result.get("point"));
 
-        assertEqualsMember(member, fromDb);
+        this.memberTestUtil.assertEqualsMember(member, fromDb);
     }
 
+    /*
+     * queryForObject 와 마찬가지로 row 를 꼭 반환해야한다. 값이 존재하지 않는다면 EmptyResultDataAccessException
+     * */
     @Test(expected = EmptyResultDataAccessException.class)
     public void queryForMapTest_EmptyResultDataAccessException() {
-        Member member = insertOnMember();
+        Member member = this.memberTestUtil.insertOnMember();
         Map<String, Object> result = this.template.queryForMap(
             "select * from member where id = ?", "KKKKK");
     }
 
     @Test
     public void queryForList() {
-        Member member1 = insertOnMember();
-        Member member2 = insertOnMember(new Member(40, "member2", 3.3));
+        int nextIndex = this.memberTestUtil.getNextIndex();
+        Member member1 = this.memberTestUtil.insertOnMember();
+        Member member2 = this.memberTestUtil.insertOnMember();
 
         List<Map<String, Object>> result = this.template.queryForList(
-            "select * from member where  id >  ? order by id", 10);
+            "select * from member where  id >  ? order by id", nextIndex);
 
         assertEquals(2, result.size());
-        assertEqualsMember(member1,
+        this.memberTestUtil.assertEqualsMember(member1,
             new Member((Integer) result.get(0).get("id"), (String) result.get(0).get("name"),
                 (Double) result.get(0).get("point")));
 
-        assertEqualsMember(member2,
+        this.memberTestUtil.assertEqualsMember(member2,
             new Member((Integer) result.get(1).get("id"), (String) result.get(1).get("name"),
                 (Double) result.get(1).get("point")));
     }
@@ -226,26 +234,6 @@ public class MemberDaoTest {
 
         int count = this.template.queryForInt("select count(*) from member");
         assertTrue(count >= loopCount);
-    }
-
-    private void assertEqualsMember(Member source, Member target) {
-        assertEquals(source.getName(), target.getName());
-        assertEquals(source.getId(), target.getId());
-        assertEquals(source.getPoint(), target.getPoint());
-    }
-
-    private Member insertOnMember() {
-        Member member = new Member();
-        member.setId(30);
-        member.setName("insertTest");
-        member.setPoint(2.3);
-        return insertOnMember(member);
-    }
-
-    private Member insertOnMember(Member member) {
-        int affectedRowCount = this.memberDao.insertBeanPropertySqlParameterSource(member);
-        assertEquals(1, affectedRowCount);
-        return member;
     }
 
 }

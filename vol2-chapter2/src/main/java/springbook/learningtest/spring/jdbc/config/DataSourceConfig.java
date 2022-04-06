@@ -7,11 +7,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
 @PropertySource("/datasource.properties")
@@ -29,7 +29,7 @@ public class DataSourceConfig {
     @Bean
     public SimpleJdbcTemplate jdbcTemplate() {
         return new SimpleJdbcTemplate(this.dataSource);
-    };
+    }
 
     @Bean
     public DataSource dataSource(
@@ -49,8 +49,14 @@ public class DataSourceConfig {
 
     @Bean
     public PlatformTransactionManager transactionManager() {
-        DataSourceTransactionManager transactionManager = new DataSourceTransactionManager(dataSource);
+        DataSourceTransactionManager transactionManager = new DataSourceTransactionManager(
+            this.dataSource);
         return transactionManager;
+    }
+
+    @Bean
+    public SimpleJdbcInsert simpleJdbcInsert() {
+        return new SimpleJdbcInsert(this.dataSource);
     }
 
 }
