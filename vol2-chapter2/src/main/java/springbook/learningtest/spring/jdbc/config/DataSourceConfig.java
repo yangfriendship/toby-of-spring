@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
@@ -27,8 +28,13 @@ public class DataSourceConfig {
     }
 
     @Bean
-    public SimpleJdbcTemplate jdbcTemplate() {
+    public SimpleJdbcTemplate simpleJdbcTemplate() {
         return new SimpleJdbcTemplate(this.dataSource);
+    }
+
+    @Bean
+    public JdbcTemplate jdbcTemplate() {
+        return new JdbcTemplate(this.dataSource);
     }
 
     @Bean
@@ -49,14 +55,7 @@ public class DataSourceConfig {
 
     @Bean
     public PlatformTransactionManager transactionManager() {
-        DataSourceTransactionManager transactionManager = new DataSourceTransactionManager(
-            this.dataSource);
-        return transactionManager;
-    }
-
-    @Bean
-    public SimpleJdbcInsert simpleJdbcInsert() {
-        return new SimpleJdbcInsert(this.dataSource);
+        return new DataSourceTransactionManager(this.dataSource);
     }
 
 }
