@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
@@ -46,13 +47,15 @@ public class MemberDaoTest {
      * */
     @Test
     public void insertTest_sqlParameter() throws Exception {
-        int affectedRowCount = this.memberDao.insertSqlParameter(30, "insertTest", 2.3);
+        int affectedRowCount = this.template.update(
+            "insert into member(id,name, point) values(?,?,?)", 30, "insertTest", 2.3);
         assertEquals(1, affectedRowCount);
     }
 
     @Test
     public void insertTest_placeholder() throws Exception {
-        int affectedRowCount = this.memberDao.insertSqlParameter(30, "insertTest", 2.3);
+        int affectedRowCount = this.template.update(
+            "insert into member(id,name, point) values(?,?,?)", 30, "insertTest", 2.3);
         assertEquals(1, affectedRowCount);
     }
 
@@ -63,13 +66,9 @@ public class MemberDaoTest {
         source.addValue("name", "insertTest");
         source.addValue("point", 2.3);
 
-        int affectedRowCount = this.memberDao.insertMapParameter(source);
+        int affectedRowCount = this.template.update("insert into member(id,name, point) values(:id,:name,:point)",
+            source);
         assertEquals(1, affectedRowCount);
-    }
-
-    @Test
-    public void insertTest_beanPropertySqlParameterSource() throws Exception {
-        memberTestUtil.insertOnMember();
     }
 
     @Test
@@ -78,10 +77,12 @@ public class MemberDaoTest {
         member.setId(30);
         member.setName("insertTest");
         member.setPoint(2.3);
-        int affectedRowCount = this.memberDao.insertBeanPropertySqlParameterSource(member);
+        SqlParameterSource source = new BeanPropertySqlParameterSource(
+            member);
+        int affectedRowCount = this.template.update("insert into member(id,name, point) values(:id,:name,:point)",source);
         assertEquals(1, affectedRowCount);
 
-        int count = this.memberDao.countMemberQueryForInt(member.getName());
+        int count = this.template.queryForInt("select count(*) from member");
         assertNotEquals(0, count);
     }
 
