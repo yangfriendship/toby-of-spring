@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import springbook.learningtest.spring.jdbc.MemberDao;
 
@@ -13,9 +14,9 @@ import springbook.learningtest.spring.jdbc.MemberDao;
 public class AppConfig {
 
     @Bean
-    public MemberDao memberDao(DataSource dataSource) {
+    public MemberDao memberDao(SimpleJdbcTemplate jdbcTemplate) {
         MemberDao memberDao = new MemberDao();
-        memberDao.setDataSource(dataSource);
+        memberDao.setJdbcTemplate(jdbcTemplate);
         return memberDao;
     }
 

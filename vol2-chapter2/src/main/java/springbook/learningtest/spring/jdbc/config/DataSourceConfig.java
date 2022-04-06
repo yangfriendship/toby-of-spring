@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -16,11 +17,19 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @PropertySource("/datasource.properties")
 public class DataSourceConfig {
 
+    @Autowired
+    DataSource dataSource;
+
     @Bean
     public static PropertySourcesPlaceholderConfigurer placeholderConfigurer() {
         PropertySourcesPlaceholderConfigurer configurer = new PropertySourcesPlaceholderConfigurer();
         return configurer;
     }
+
+    @Bean
+    public SimpleJdbcTemplate jdbcTemplate() {
+        return new SimpleJdbcTemplate(this.dataSource);
+    };
 
     @Bean
     public DataSource dataSource(
@@ -37,9 +46,6 @@ public class DataSourceConfig {
         source.setUrl(url);
         return source;
     }
-
-    @Autowired
-    DataSource dataSource;
 
     @Bean
     public PlatformTransactionManager transactionManager() {
