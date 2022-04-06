@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:context="http://www.springframework.org/schema/context"
+  xmlns:util="http://www.springframework.org/schema/util"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+  <context:annotation-config/>
+  <context:component-scan base-package="springbook.learningtest.spring.ioc.bean.example"/>
+
+  <bean id="hello" class="springbook.learningtest.spring.ioc.Hello">
+    <property name="name" value="Spring"/>
+    <property name="printer" ref="stringPrinter"/>
+  </bean>
+
+  <bean id="stringPrinter" class="springbook.learningtest.spring.ioc.StringPrinter"/>
+  <bean id="consolePrinter" class="springbook.learningtest.spring.ioc.ConsolePrinter"/>
+
+  <bean id="constructorHello" class="springbook.learningtest.spring.ioc.Hello">
+    <constructor-arg index="0" value="constructorHello"/>
+    <constructor-arg index="1" ref="stringPrinter"/>
+  </bean>
+
+  <bean id="autowireHello" class="springbook.learningtest.spring.ioc.Hello" autowire="byName">
+    <property name="name" value="autowireHello"/>
+    <!--  setPrinter 에 해당하는 이름의 빈이 존재하면 자동으로 주입해준다-->
+  </bean>
+
+  <bean id="printer" class="springbook.learningtest.spring.ioc.StringPrinter"/>
+
+  <util:list id="printerBeans" value-type="springbook.learningtest.spring.ioc.Printer">
+    <ref bean="printer"/>
+    <ref bean="consolePrinter"/>
+    <ref bean="stringPrinter"/>
+  </util:list>
+
+</beans>
