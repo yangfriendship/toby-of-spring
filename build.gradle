@@ -28,6 +28,8 @@ subprojects {
         implementation 'org.springframework:spring-context-support:4.0.3.RELEASE'
         implementation 'org.springframework:spring-expression:4.0.3.RELEASE'
         implementation 'org.springframework:spring-webmvc:4.0.3.RELEASE'
+        implementation 'org.springframework:spring-web:4.0.3.RELEASE'
+
 
 // https://mvnrepository.com/artifact/org.hibernate/hibernate-core
         implementation 'org.hibernate:hibernate-core:4.2.10.Final'
