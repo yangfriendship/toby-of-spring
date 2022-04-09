@@ -54,25 +54,53 @@ public class SingletonTest {
     }
 
     @Component
-    @Getter
-    @Setter
     static class SingletonBeanClient {
 
         @Autowired
         SingletonBean bean1;
         @Autowired
         SingletonBean bean2;
+
+        public SingletonBean getBean1() {
+            return bean1;
+        }
+
+        public void setBean1(SingletonBean bean1) {
+            this.bean1 = bean1;
+        }
+
+        public SingletonBean getBean2() {
+            return bean2;
+        }
+
+        public void setBean2(SingletonBean bean2) {
+            this.bean2 = bean2;
+        }
     }
 
     @Component
-    @Getter
-    @Setter
     static class PrototypeBeanClient {
 
         @Autowired
         PrototypeBean bean1;
         @Autowired
         PrototypeBean bean2;
+
+        public PrototypeBean getBean1() {
+            return bean1;
+        }
+
+        public void setBean1(PrototypeBean bean1) {
+            this.bean1 = bean1;
+        }
+
+        public PrototypeBean getBean2() {
+            return bean2;
+        }
+
+        public void setBean2(PrototypeBean bean2) {
+            this.bean2 = bean2;
+        }
     }
 
     static class PrototypeBean {

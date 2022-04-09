@@ -16,8 +16,8 @@ subprojects {
         testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
         testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
 
-
         /* Spring */
+        implementation 'org.springframework:spring-orm:4.0.3.RELEASE'
         testImplementation 'org.springframework:spring-test:4.0.3.RELEASE'
         implementation 'org.springframework:spring-context:4.0.3.RELEASE'
         implementation 'org.springframework:spring-core:4.0.3.RELEASE'
@@ -28,6 +28,13 @@ subprojects {
         implementation 'org.springframework:spring-context-support:4.0.3.RELEASE'
         implementation 'org.springframework:spring-expression:4.0.3.RELEASE'
         implementation 'org.springframework:spring-webmvc:4.0.3.RELEASE'
+
+// https://mvnrepository.com/artifact/org.hibernate/hibernate-core
+        implementation 'org.hibernate:hibernate-core:4.2.10.Final'
+// https://mvnrepository.com/artifact/org.hibernate/hibernate-entitymanager
+        implementation 'org.hibernate:hibernate-entitymanager:4.2.10.Final'
+
+        implementation 'org.glassfish.jaxb:jaxb-runtime:3.0.0'
 
 
         implementation 'cglib:cglib:2.2'
