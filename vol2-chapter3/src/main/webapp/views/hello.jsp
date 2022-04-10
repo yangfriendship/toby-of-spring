@@ -10,7 +10,8 @@
 <head>
     <title>Title</title>
     Hello Jsp <br>
-    ${message}
+    ${message} <br>
+    ${interceptor} <br>
 </head>
 <body>
 

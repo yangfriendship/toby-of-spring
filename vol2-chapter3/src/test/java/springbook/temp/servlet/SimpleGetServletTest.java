@@ -56,7 +56,6 @@ public class SimpleGetServletTest {
         MockHttpServletResponse res = new MockHttpServletResponse();
 
         ModelAndView modelAndView = helloController.handleRequest(req, res);
-        System.out.println("");
     }
 
 }
